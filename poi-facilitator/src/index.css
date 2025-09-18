@@ -1,12 +1,75 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import './i18n/rtl.css';
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* Points of You AI Studio - Global Styles */
+
+/* Voice Interface Styles */
+@layer components {
+  .voice-interface {
+    font-family: 'Inter', sans-serif;
+  }
+
+  .voice-button {
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .voice-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  .voice-button.listening {
+    animation: pulse-recording 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse-recording {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+    50% {
+      transform: scale(1.05);
+      box-shadow: 0 8px 20px rgba(239, 68, 68, 0.5);
+    }
+  }
+
+  .voice-transcript {
+    transition: all 0.3s ease;
+    font-family: 'Kalam', cursive;
+  }
+
+  .voice-transcript.has-content {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border-color: #3b82f6;
+  }
+
+  .final-transcript {
+    color: #1f2937;
+    font-weight: 500;
+  }
+
+  .interim-transcript {
+    color: #6b7280;
+    font-style: italic;
+    opacity: 0.8;
+  }
+
+  .voice-journal-interface {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    padding: 16px;
+  }
+}
 
 @layer base {
   :root {

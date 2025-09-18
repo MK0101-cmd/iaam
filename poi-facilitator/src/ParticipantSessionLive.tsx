@@ -3,6 +3,8 @@ import {
   Mic, Video, MessageSquare, Hand, Camera, Settings, ArrowLeft,
   Send, Clock, Bot, Maximize2, Minimize2
 } from "lucide-react";
+import { CardDisplay } from "./components/CardDisplay";
+import { getCardById, getRandomCards, type Card } from "./data/cards";
 
 /*
   Live Participant Session Experience
@@ -181,9 +183,14 @@ export default function ParticipantSessionLive() {
                     selectedCard === card.id ? "border-blue-500" : "border-slate-200"
                   }`}
                 >
-                  <div className={`w-full h-full bg-gradient-to-br ${card.gradient} flex items-center justify-center text-white font-medium text-[10px] text-center p-1`}>
-                    {card.title}
-                  </div>
+                  <CardDisplay
+                    card={card}
+                    size="sm"
+                    variant="compact"
+                    showTitle={true}
+                    showDescription={false}
+                    className="w-full h-full"
+                  />
                 </button>
               ))}
             </div>
@@ -298,8 +305,15 @@ function ParticipantSessionCard({ participant }: { participant: any }) {
       </div>
       
       {participant.selectedCard ? (
-        <div className={`aspect-[4/3] rounded-lg bg-gradient-to-br ${participant.selectedCard.gradient} flex items-center justify-center text-white font-medium text-xs shadow-sm`}>
-          {participant.selectedCard.title}
+        <div className="aspect-[4/3]">
+          <CardDisplay
+            card={participant.selectedCard}
+            size="sm"
+            variant="compact"
+            showTitle={true}
+            showDescription={false}
+            className="w-full h-full"
+          />
         </div>
       ) : (
         <div className="aspect-[4/3] rounded-lg border-2 border-dashed border-white/30 flex items-center justify-center text-white/60 text-xs">
@@ -324,41 +338,25 @@ const participantSessionCards = [
   {
     id: "psc1",
     name: "Sarah Chen",
-    selectedCard: {
-      id: "card1",
-      title: "Mountain Peak",
-      gradient: "from-purple-500 to-pink-600"
-    },
+    selectedCard: getCardById("leadership"),
     status: "completed"
   },
   {
     id: "psc2",
     name: "David Kim", 
-    selectedCard: {
-      id: "card2",
-      title: "Bridge",
-      gradient: "from-blue-500 to-indigo-600"
-    },
+    selectedCard: getCardById("choice"),
     status: "completed"
   },
   {
     id: "psc3",
     name: "Maria Lopez",
-    selectedCard: {
-      id: "card3", 
-      title: "Sunrise",
-      gradient: "from-yellow-500 to-orange-600"
-    },
+    selectedCard: getCardById("everything_is_possible"),
     status: "reflecting"
   },
   {
     id: "psc4",
     name: "Alex Johnson",
-    selectedCard: {
-      id: "card4",
-      title: "Tree Roots", 
-      gradient: "from-green-500 to-emerald-600"
-    },
+    selectedCard: getCardById("balance"),
     status: "completed"
   },
   {
@@ -369,32 +367,14 @@ const participantSessionCards = [
   }
 ];
 
-const sessionCards = [
-  {
-    id: "card1",
-    title: "Mountain Peak",
-    description: "Reaching new heights, overcoming challenges, achievement",
-    gradient: "from-purple-500 to-pink-600"
-  },
-  {
-    id: "card2", 
-    title: "Bridge",
-    description: "Transition, connection, crossing from one state to another",
-    gradient: "from-blue-500 to-indigo-600"
-  },
-  {
-    id: "card3",
-    title: "Sunrise",
-    description: "New beginnings, hope, fresh start, awakening",
-    gradient: "from-yellow-500 to-orange-600"
-  },
-  {
-    id: "card4",
-    title: "Tree Roots",
-    description: "Foundation, grounding, stability, growth from within",
-    gradient: "from-green-500 to-emerald-600"
-  }
-];
+const sessionCards: Card[] = [
+  getCardById("leadership")!,
+  getCardById("choice")!,
+  getCardById("everything_is_possible")!,
+  getCardById("balance")!,
+  getCardById("just_be")!,
+  getCardById("learning")!
+].filter(Boolean);
 
 const chatMessages = [
   {

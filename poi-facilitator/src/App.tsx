@@ -3,15 +3,24 @@ import SessionIntegratedUI from "@/SessionIntegratedUI";
 import FacilitatorConsoleMockup from "./FacilitatorConsoleMocup";
 import ParticipantExperience from "./ParticipantExperience";
 import ParticipantSessionLive from "./ParticipantSessionLive";
+import { ErrorBoundary } from "./components/ErrorBoundary";
+import { useTranslation } from './hooks/useTranslation';
+import './i18n/config'; // Initialize i18n
 
-export default function App() {
+function AppContent() {
   const [route, setRoute] = useState<string>(() => location.hash.replace(/^#\/?/, "") || "studio");
+  const { isRTL, getDirectionClasses } = useTranslation();
 
   useEffect(() => {
     const onHashChange = () => setRoute(location.hash.replace(/^#\/?/, "") || "studio");
     window.addEventListener("hashchange", onHashChange);
     return () => window.removeEventListener("hashchange", onHashChange);
   }, []);
+
+  // Apply RTL/LTR direction to document
+  useEffect(() => {
+    document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
+  }, [isRTL]);
 
   // Route to live participant session
   if (route === "participant/session/live") {
@@ -35,4 +44,12 @@ export default function App() {
   
   // Default to studio console (journeys/home page)
   return <FacilitatorConsoleMockup />;
+}
+
+export default function App() {
+  return (
+    <ErrorBoundary>
+      <AppContent />
+    </ErrorBoundary>
+  );
 }

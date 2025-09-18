@@ -1,0 +1,333 @@
+{
+  "common": {
+    "save": "שמור",
+    "cancel": "בטל",
+    "delete": "מחק",
+    "edit": "ערוך",
+    "add": "הוסף",
+    "remove": "הסר",
+    "close": "סגור",
+    "back": "חזור",
+    "next": "הבא",
+    "previous": "הקודם",
+    "continue": "המשך",
+    "finish": "סיים",
+    "loading": "טוען...",
+    "error": "שגיאה",
+    "success": "הצלחה",
+    "warning": "אזהרה",
+    "info": "מידע",
+    "search": "חפש",
+    "filter": "סנן",
+    "sort": "מיין",
+    "export": "ייצא",
+    "import": "ייבא",
+    "settings": "הגדרות",
+    "help": "עזרה",
+    "more": "עוד",
+    "less": "פחות",
+    "show": "הצג",
+    "hide": "הסתר",
+    "yes": "כן",
+    "no": "לא",
+    "ok": "אישור",
+    "apply": "החל",
+    "reset": "איפוס",
+    "clear": "נקה",
+    "select": "בחר",
+    "deselect": "בטל בחירה",
+    "all": "הכל",
+    "none": "ללא"
+  },
+  "navigation": {
+    "journeys": "מסעות",
+    "onAir": "בשידור חי",
+    "library": "ספריה",
+    "clients": "לקוחות",
+    "calendar": "לוח שנה",
+    "reports": "דוחות",
+    "marketplace": "שוק",
+    "settings": "הגדרות",
+    "session": "סשן",
+    "participant": "משתתף",
+    "dashboard": "לוח בקרה",
+    "profile": "פרופיל",
+    "logout": "התנתק"
+  },
+  "facilitator": {
+    "console": {
+      "title": "קונסולת המנחה",
+      "subtitle": "עצב ונהל את סשני Points of You שלך",
+      "createJourney": "צור מסע חדש",
+      "editJourney": "ערוך מסע",
+      "deleteJourney": "מחק מסע",
+      "duplicateJourney": "שכפל מסע",
+      "shareJourney": "שתף מסע",
+      "publishJourney": "פרסם מסע"
+    },
+    "journey": {
+      "title": "בונה המסעות",
+      "description": "צור חוויות משמעותיות עם מתודולוגיית Points of You",
+      "phases": {
+        "pause": "עצירה",
+        "expand": "הרחבה",
+        "focus": "מיקוד",
+        "doing": "עשייה"
+      },
+      "elements": {
+        "word": "מילה",
+        "prompt": "שאלה",
+        "exercise": "תרגיל",
+        "deck": "חפיסה",
+        "template": "תבנית",
+        "visual": "ויזואל"
+      },
+      "timeframes": {
+        "single": "סשן יחיד",
+        "halfDay": "חצי יום",
+        "fullDay": "יום שלם",
+        "multiDay": "רב יומי",
+        "weekly": "תוכנית שבועית",
+        "monthly": "תוכנית חודשית"
+      }
+    },
+    "session": {
+      "title": "סשן חי",
+      "subtitle": "נחה את סשן Points of You שלך",
+      "start": "התחל סשן",
+      "pause": "השהה סשן",
+      "resume": "חדש סשן",
+      "end": "סיים סשן",
+      "participants": "משתתפים",
+      "breakouts": "חדרי קבוצות",
+      "recording": "הקלטה",
+      "chat": "צ'אט",
+      "whiteboard": "לוח לבן",
+      "cards": "קלפים",
+      "timer": "טיימר"
+    },
+    "participants": {
+      "title": "משתתפים",
+      "online": "מחובר",
+      "offline": "לא מחובר",
+      "selecting": "בוחר קלף",
+      "reflecting": "מהרהר",
+      "completed": "הושלם",
+      "invite": "הזמן משתתפים",
+      "manage": "נהל משתתפים",
+      "mute": "השתק",
+      "unmute": "בטל השתקה",
+      "camera": "מצלמה",
+      "microphone": "מיקרופון"
+    }
+  },
+  "participant": {
+    "dashboard": {
+      "title": "הלוח שלי",
+      "subtitle": "המסע שלך ב-Points of You",
+      "upcomingSessions": "סשנים קרובים",
+      "recentSessions": "סשנים אחרונים",
+      "myProgress": "ההתקדמות שלי",
+      "achievements": "הישגים",
+      "goals": "מטרות",
+      "journal": "יומן"
+    },
+    "journal": {
+      "title": "היומן שלי",
+      "subtitle": "הרהר על המסע שלך",
+      "newEntry": "רשומה חדשה",
+      "editEntry": "ערוך רשומה",
+      "deleteEntry": "מחק רשומה",
+      "mood": "מצב רוח",
+      "insights": "תובנות",
+      "reflections": "הרהורים",
+      "prompts": "שאלות הרהור",
+      "save": "שמור רשומה",
+      "draft": "טיוטה"
+    },
+    "session": {
+      "title": "סשן חי",
+      "subtitle": "השתתף בסשן Points of You שלך",
+      "join": "הצטרף לסשן",
+      "leave": "עזוב סשן",
+      "selectCard": "בחר קלף",
+      "reflection": "ההרהור שלך",
+      "share": "שתף עם הקבוצה",
+      "listen": "מצב האזנה",
+      "handRaise": "הרם יד",
+      "chat": "צ'אט",
+      "breakout": "חדר קבוצה"
+    },
+    "cards": {
+      "title": "בחירת קלפים",
+      "subtitle": "בחר קלף שמדבר אליך",
+      "selected": "נבחר",
+      "deselect": "בטל בחירה",
+      "confirm": "אשר בחירה",
+      "change": "החלף קלף",
+      "reflect": "הרהר על הקלף הזה"
+    }
+  },
+  "aiCoach": {
+    "title": "מאמן AI",
+    "subtitle": "המדריך האישי שלך ל-Points of You",
+    "placeholder": "שתף מה עובר לך בראש...",
+    "send": "שלח",
+    "thinking": "חושב...",
+    "suggestions": "הצעות",
+    "insights": "תובנות אישיות",
+    "quotes": {
+      "title": "השראה",
+      "subtitle": "דברי חכמה"
+    },
+    "voice": {
+      "enable": "הפעל קול",
+      "disable": "כבה קול",
+      "listening": "מאזין...",
+      "speaking": "מדבר..."
+    }
+  },
+  "content": {
+    "library": {
+      "title": "ספריית תוכן",
+      "subtitle": "חקור משאבי Points of You",
+      "search": "חפש תוכן...",
+      "categories": "קטגוריות",
+      "recent": "בשימוש לאחרונה",
+      "favorites": "מועדפים",
+      "myContent": "התוכן שלי",
+      "shared": "תוכן משותף",
+      "official": "תוכן רשמי"
+    },
+    "cards": {
+      "title": "קלפים",
+      "description": "קלפים ויזואליים להרהור ותובנה",
+      "themes": "נושאים",
+      "emotions": "תהודה רגשית",
+      "contexts": "הקשרי שימוש",
+      "inspiration": "סיפור השראה"
+    },
+    "templates": {
+      "title": "תבניות",
+      "description": "מסגרות סשן מוכנות מראש",
+      "duration": "משך זמן",
+      "participants": "משתתפים",
+      "objectives": "יעדים",
+      "preview": "תצוגה מקדימה של תבנית"
+    }
+  },
+  "video": {
+    "meeting": {
+      "title": "פגישת וידאו",
+      "start": "התחל פגישה",
+      "join": "הצטרף לפגישה",
+      "leave": "עזוב פגישה",
+      "mute": "השתק",
+      "unmute": "בטל השתקה",
+      "camera": "מצלמה",
+      "screen": "שתף מסך",
+      "record": "הקלט",
+      "stop": "עצור הקלטה"
+    },
+    "providers": {
+      "zoom": "Zoom",
+      "meet": "Google Meet",
+      "teams": "Microsoft Teams"
+    },
+    "status": {
+      "connecting": "מתחבר...",
+      "connected": "מחובר",
+      "disconnected": "מנותק",
+      "reconnecting": "מתחבר מחדש..."
+    }
+  },
+  "reports": {
+    "title": "דוחות וניתוחים",
+    "subtitle": "תובנות מהסשנים שלך",
+    "engagement": "מעורבות",
+    "participation": "השתתפות",
+    "outcomes": "תוצאות",
+    "feedback": "משוב",
+    "export": "ייצא דוח",
+    "dateRange": "טווח תאריכים",
+    "sessions": "סשנים",
+    "participants": "משתתפים",
+    "cards": "קלפים בשימוש",
+    "insights": "תובנות מרכזיות"
+  },
+  "settings": {
+    "title": "הגדרות",
+    "subtitle": "התאם אישית את החוויה שלך",
+    "language": "שפה",
+    "notifications": "התראות",
+    "privacy": "פרטיות",
+    "account": "חשבון",
+    "billing": "חיוב",
+    "integrations": "אינטגרציות",
+    "appearance": "מראה",
+    "accessibility": "נגישות"
+  },
+  "language": {
+    "title": "הגדרות שפה",
+    "subtitle": "בחר את השפה המועדפת עליך",
+    "current": "שפה נוכחית",
+    "available": "שפות זמינות",
+    "change": "החלף שפה",
+    "apply": "החל שינויים",
+    "restart": "נדרש אתחול לשינוי שפה מלא"
+  },
+  "errors": {
+    "general": "משהו השתבש. אנא נסה שוב.",
+    "network": "שגיאת רשת. אנא בדוק את החיבור שלך.",
+    "authentication": "אימות נכשל. אנא התחבר שוב.",
+    "authorization": "אין לך הרשאה לגשת למשאב זה.",
+    "notFound": "המשאב המבוקש לא נמצא.",
+    "validation": "אנא בדוק את הקלט שלך ונסה שוב.",
+    "session": "הסשן פג תוקף. אנא רענן את הדף.",
+    "video": "חיבור הוידאו נכשל. אנא בדוק את המצלמה והמיקרופון שלך.",
+    "audio": "חיבור השמע נכשל. אנא בדוק את המיקרופון שלך.",
+    "upload": "העלאת הקובץ נכשלה. אנא נסה שוב.",
+    "save": "שמירת השינויים נכשלה. אנא נסה שוב."
+  },
+  "success": {
+    "saved": "השינויים נשמרו בהצלחה",
+    "deleted": "הפריט נמחק בהצלחה",
+    "created": "הפריט נוצר בהצלחה",
+    "updated": "הפריט עודכן בהצלחה",
+    "shared": "הפריט שותף בהצלחה",
+    "copied": "הועתק ללוח",
+    "sent": "ההודעה נשלחה בהצלחה",
+    "joined": "הצטרפת לסשן בהצלחה",
+    "left": "עזבת את הסשן בהצלחה"
+  },
+  "time": {
+    "now": "עכשיו",
+    "today": "היום",
+    "yesterday": "אתמול",
+    "tomorrow": "מחר",
+    "thisWeek": "השבוע",
+    "lastWeek": "השבוע שעבר",
+    "nextWeek": "השבוע הבא",
+    "thisMonth": "החודש",
+    "lastMonth": "החודש שעבר",
+    "nextMonth": "החודש הבא",
+    "minutes": "דקות",
+    "hours": "שעות",
+    "days": "ימים",
+    "weeks": "שבועות",
+    "months": "חודשים",
+    "years": "שנים"
+  },
+  "placeholders": {
+    "searchJourneys": "חפש מסעות...",
+    "searchParticipants": "חפש משתתפים...",
+    "searchContent": "חפש תוכן...",
+    "enterMessage": "הכנס את ההודעה שלך...",
+    "enterReflection": "שתף את ההרהור שלך...",
+    "journeyName": "הכנס שם מסע...",
+    "sessionTitle": "הכנס כותרת סשן...",
+    "email": "הכנס כתובת אימייל...",
+    "name": "הכנס שם..."
+  }
+}
+

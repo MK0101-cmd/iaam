@@ -1,0 +1,333 @@
+{
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "add": "Agregar",
+    "remove": "Quitar",
+    "close": "Cerrar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "continue": "Continuar",
+    "finish": "Finalizar",
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "warning": "Advertencia",
+    "info": "Información",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "sort": "Ordenar",
+    "export": "Exportar",
+    "import": "Importar",
+    "settings": "Configuración",
+    "help": "Ayuda",
+    "more": "Más",
+    "less": "Menos",
+    "show": "Mostrar",
+    "hide": "Ocultar",
+    "yes": "Sí",
+    "no": "No",
+    "ok": "Aceptar",
+    "apply": "Aplicar",
+    "reset": "Restablecer",
+    "clear": "Limpiar",
+    "select": "Seleccionar",
+    "deselect": "Deseleccionar",
+    "all": "Todos",
+    "none": "Ninguno"
+  },
+  "navigation": {
+    "journeys": "Jornadas",
+    "onAir": "En Vivo",
+    "library": "Biblioteca",
+    "clients": "Clientes",
+    "calendar": "Calendario",
+    "reports": "Informes",
+    "marketplace": "Mercado",
+    "settings": "Configuración",
+    "session": "Sesión",
+    "participant": "Participante",
+    "dashboard": "Panel",
+    "profile": "Perfil",
+    "logout": "Cerrar Sesión"
+  },
+  "facilitator": {
+    "console": {
+      "title": "Consola del Facilitador",
+      "subtitle": "Diseña y gestiona tus sesiones de Points of You",
+      "createJourney": "Crear Nueva Jornada",
+      "editJourney": "Editar Jornada",
+      "deleteJourney": "Eliminar Jornada",
+      "duplicateJourney": "Duplicar Jornada",
+      "shareJourney": "Compartir Jornada",
+      "publishJourney": "Publicar Jornada"
+    },
+    "journey": {
+      "title": "Constructor de Jornadas",
+      "description": "Crea experiencias significativas con la metodología Points of You",
+      "phases": {
+        "pause": "Pausa",
+        "expand": "Expandir",
+        "focus": "Enfocar",
+        "doing": "Hacer"
+      },
+      "elements": {
+        "word": "Palabra",
+        "prompt": "Pregunta",
+        "exercise": "Ejercicio",
+        "deck": "Mazo",
+        "template": "Plantilla",
+        "visual": "Visual"
+      },
+      "timeframes": {
+        "single": "Sesión Individual",
+        "halfDay": "Medio Día",
+        "fullDay": "Día Completo",
+        "multiDay": "Multi-Día",
+        "weekly": "Programa Semanal",
+        "monthly": "Programa Mensual"
+      }
+    },
+    "session": {
+      "title": "Sesión en Vivo",
+      "subtitle": "Facilita tu sesión de Points of You",
+      "start": "Iniciar Sesión",
+      "pause": "Pausar Sesión",
+      "resume": "Reanudar Sesión",
+      "end": "Terminar Sesión",
+      "participants": "Participantes",
+      "breakouts": "Salas de Grupos",
+      "recording": "Grabación",
+      "chat": "Chat",
+      "whiteboard": "Pizarra",
+      "cards": "Cartas",
+      "timer": "Cronómetro"
+    },
+    "participants": {
+      "title": "Participantes",
+      "online": "En Línea",
+      "offline": "Fuera de Línea",
+      "selecting": "Seleccionando Carta",
+      "reflecting": "Reflexionando",
+      "completed": "Completado",
+      "invite": "Invitar Participantes",
+      "manage": "Gestionar Participantes",
+      "mute": "Silenciar",
+      "unmute": "Activar Audio",
+      "camera": "Cámara",
+      "microphone": "Micrófono"
+    }
+  },
+  "participant": {
+    "dashboard": {
+      "title": "Mi Panel",
+      "subtitle": "Tu jornada con Points of You",
+      "upcomingSessions": "Sesiones Próximas",
+      "recentSessions": "Sesiones Recientes",
+      "myProgress": "Mi Progreso",
+      "achievements": "Logros",
+      "goals": "Objetivos",
+      "journal": "Diario"
+    },
+    "journal": {
+      "title": "Mi Diario",
+      "subtitle": "Reflexiona sobre tu jornada",
+      "newEntry": "Nueva Entrada",
+      "editEntry": "Editar Entrada",
+      "deleteEntry": "Eliminar Entrada",
+      "mood": "Estado de Ánimo",
+      "insights": "Percepciones",
+      "reflections": "Reflexiones",
+      "prompts": "Preguntas de Reflexión",
+      "save": "Guardar Entrada",
+      "draft": "Borrador"
+    },
+    "session": {
+      "title": "Sesión en Vivo",
+      "subtitle": "Participa en tu sesión de Points of You",
+      "join": "Unirse a la Sesión",
+      "leave": "Salir de la Sesión",
+      "selectCard": "Seleccionar una Carta",
+      "reflection": "Tu Reflexión",
+      "share": "Compartir con el Grupo",
+      "listen": "Modo Escucha",
+      "handRaise": "Levantar la Mano",
+      "chat": "Chat",
+      "breakout": "Sala de Grupo"
+    },
+    "cards": {
+      "title": "Selección de Cartas",
+      "subtitle": "Elige una carta que resuene contigo",
+      "selected": "Seleccionada",
+      "deselect": "Deseleccionar",
+      "confirm": "Confirmar Selección",
+      "change": "Cambiar Carta",
+      "reflect": "Reflexionar sobre esta carta"
+    }
+  },
+  "aiCoach": {
+    "title": "Coach IA",
+    "subtitle": "Tu guía personal de Points of You",
+    "placeholder": "Comparte lo que tienes en mente...",
+    "send": "Enviar",
+    "thinking": "Pensando...",
+    "suggestions": "Sugerencias",
+    "insights": "Percepciones Personales",
+    "quotes": {
+      "title": "Inspiración",
+      "subtitle": "Palabras de sabiduría"
+    },
+    "voice": {
+      "enable": "Activar Voz",
+      "disable": "Desactivar Voz",
+      "listening": "Escuchando...",
+      "speaking": "Hablando..."
+    }
+  },
+  "content": {
+    "library": {
+      "title": "Biblioteca de Contenido",
+      "subtitle": "Explora recursos de Points of You",
+      "search": "Buscar contenido...",
+      "categories": "Categorías",
+      "recent": "Usado Recientemente",
+      "favorites": "Favoritos",
+      "myContent": "Mi Contenido",
+      "shared": "Contenido Compartido",
+      "official": "Contenido Oficial"
+    },
+    "cards": {
+      "title": "Cartas",
+      "description": "Cartas visuales para reflexión e insight",
+      "themes": "Temas",
+      "emotions": "Resonancia Emocional",
+      "contexts": "Contextos de Uso",
+      "inspiration": "Historia de Inspiración"
+    },
+    "templates": {
+      "title": "Plantillas",
+      "description": "Marcos de sesión pre-construidos",
+      "duration": "Duración",
+      "participants": "Participantes",
+      "objectives": "Objetivos",
+      "preview": "Vista Previa de Plantilla"
+    }
+  },
+  "video": {
+    "meeting": {
+      "title": "Reunión de Video",
+      "start": "Iniciar Reunión",
+      "join": "Unirse a la Reunión",
+      "leave": "Salir de la Reunión",
+      "mute": "Silenciar",
+      "unmute": "Activar Audio",
+      "camera": "Cámara",
+      "screen": "Compartir Pantalla",
+      "record": "Grabar",
+      "stop": "Detener Grabación"
+    },
+    "providers": {
+      "zoom": "Zoom",
+      "meet": "Google Meet",
+      "teams": "Microsoft Teams"
+    },
+    "status": {
+      "connecting": "Conectando...",
+      "connected": "Conectado",
+      "disconnected": "Desconectado",
+      "reconnecting": "Reconectando..."
+    }
+  },
+  "reports": {
+    "title": "Informes y Análisis",
+    "subtitle": "Insights de tus sesiones",
+    "engagement": "Participación",
+    "participation": "Participación",
+    "outcomes": "Resultados",
+    "feedback": "Comentarios",
+    "export": "Exportar Informe",
+    "dateRange": "Rango de Fechas",
+    "sessions": "Sesiones",
+    "participants": "Participantes",
+    "cards": "Cartas Utilizadas",
+    "insights": "Insights Clave"
+  },
+  "settings": {
+    "title": "Configuración",
+    "subtitle": "Personaliza tu experiencia",
+    "language": "Idioma",
+    "notifications": "Notificaciones",
+    "privacy": "Privacidad",
+    "account": "Cuenta",
+    "billing": "Facturación",
+    "integrations": "Integraciones",
+    "appearance": "Apariencia",
+    "accessibility": "Accesibilidad"
+  },
+  "language": {
+    "title": "Configuración de Idioma",
+    "subtitle": "Elige tu idioma preferido",
+    "current": "Idioma Actual",
+    "available": "Idiomas Disponibles",
+    "change": "Cambiar Idioma",
+    "apply": "Aplicar Cambios",
+    "restart": "Se requiere reiniciar para el cambio completo de idioma"
+  },
+  "errors": {
+    "general": "Algo salió mal. Por favor, inténtalo de nuevo.",
+    "network": "Error de red. Por favor, verifica tu conexión.",
+    "authentication": "Falló la autenticación. Por favor, inicia sesión de nuevo.",
+    "authorization": "No tienes permiso para acceder a este recurso.",
+    "notFound": "El recurso solicitado no fue encontrado.",
+    "validation": "Por favor, verifica tu entrada e inténtalo de nuevo.",
+    "session": "Sesión expirada. Por favor, actualiza la página.",
+    "video": "Falló la conexión de video. Por favor, verifica tu cámara y micrófono.",
+    "audio": "Falló la conexión de audio. Por favor, verifica tu micrófono.",
+    "upload": "Falló la carga del archivo. Por favor, inténtalo de nuevo.",
+    "save": "Falló al guardar los cambios. Por favor, inténtalo de nuevo."
+  },
+  "success": {
+    "saved": "Cambios guardados exitosamente",
+    "deleted": "Elemento eliminado exitosamente",
+    "created": "Elemento creado exitosamente",
+    "updated": "Elemento actualizado exitosamente",
+    "shared": "Elemento compartido exitosamente",
+    "copied": "Copiado al portapapeles",
+    "sent": "Mensaje enviado exitosamente",
+    "joined": "Unido a la sesión exitosamente",
+    "left": "Salió de la sesión exitosamente"
+  },
+  "time": {
+    "now": "Ahora",
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "tomorrow": "Mañana",
+    "thisWeek": "Esta Semana",
+    "lastWeek": "Semana Pasada",
+    "nextWeek": "Próxima Semana",
+    "thisMonth": "Este Mes",
+    "lastMonth": "Mes Pasado",
+    "nextMonth": "Próximo Mes",
+    "minutes": "minutos",
+    "hours": "horas",
+    "days": "días",
+    "weeks": "semanas",
+    "months": "meses",
+    "years": "años"
+  },
+  "placeholders": {
+    "searchJourneys": "Buscar jornadas...",
+    "searchParticipants": "Buscar participantes...",
+    "searchContent": "Buscar contenido...",
+    "enterMessage": "Escribe tu mensaje...",
+    "enterReflection": "Comparte tu reflexión...",
+    "journeyName": "Ingresa el nombre de la jornada...",
+    "sessionTitle": "Ingresa el título de la sesión...",
+    "email": "Ingresa dirección de email...",
+    "name": "Ingresa nombre..."
+  }
+}
+

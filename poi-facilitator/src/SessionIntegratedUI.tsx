@@ -7,6 +7,8 @@ import {
   BarChart3 as BarChartIcon, TrendingUp, PieChart, BookOpen
 } from "lucide-react";
 import { Button } from "./design-system/components";
+import { CardDisplay } from "./components/CardDisplay";
+import { allCards, getCardById, getRandomCards, type Card as CardType } from "./data/cards";
 
 /*
   Integrated Session UI — Participant-first mockup with breakouts (2–4 ppl)
@@ -21,7 +23,7 @@ type Room = { id: string; name: string; members: string[] };
 
 interface SharedCard {
   id: string;
-  card: Card;
+  card: CardType;
   sharedBy: string;
   timestamp: number;
 }
@@ -82,7 +84,7 @@ export default function SessionIntegratedUI() {
     setActiveRoomId(null);
   }
   
-  function shareCardToRoom(roomId: string, card: Card, participantName: string) {
+  function shareCardToRoom(roomId: string, card: CardType, participantName: string) {
     const currentCards = roomSharedCards[roomId] || [];
     if (currentCards.length >= 3) return; // Max 3 cards per room
     
@@ -104,7 +106,7 @@ export default function SessionIntegratedUI() {
     }));
   }
   
-  function replaceSharedCard(roomId: string, cardIndex: number, newCard: Card, participantName: string) {
+  function replaceSharedCard(roomId: string, cardIndex: number, newCard: CardType, participantName: string) {
     const currentCards = roomSharedCards[roomId] || [];
     if (cardIndex >= currentCards.length) return;
     
@@ -362,8 +364,8 @@ function SessionBody({
   setSelectedParticipant: (participant: ParticipantCard | null) => void;
   roomSharedCards: {[roomId: string]: SharedCard[]};
   cardSharingParticipant: {[roomId: string]: string};
-  shareCardToRoom: (roomId: string, card: Card, participantName: string) => void;
-  replaceSharedCard: (roomId: string, cardIndex: number, newCard: Card, participantName: string) => void;
+  shareCardToRoom: (roomId: string, card: CardType, participantName: string) => void;
+  replaceSharedCard: (roomId: string, cardIndex: number, newCard: CardType, participantName: string) => void;
 }){
   return (
     <>
@@ -1141,7 +1143,7 @@ function ParticipantCardDisplay({ participant, onClick }: { participant: Partici
         </div>
         <div className="flex-1 min-w-0">
           <div className="text-xs font-medium truncate">{participant.name}</div>
-          <div className="text-[10px] text-slate-500">{participant.status}</div>
+          <div className="text-[10px] text-slate-500 capitalize">{participant.status}</div>
         </div>
         {onClick && (
           <div className="text-xs text-blue-600">👁️</div>
@@ -1150,8 +1152,15 @@ function ParticipantCardDisplay({ participant, onClick }: { participant: Partici
       
       {participant.selectedCard ? (
         <div className="space-y-1">
-          <div className={`aspect-[4/3] rounded-lg bg-gradient-to-br ${participant.selectedCard.gradient} flex items-center justify-center text-white font-medium text-xs shadow-sm`}>
-            {participant.selectedCard.title}
+          <div className="aspect-[4/3]">
+            <CardDisplay
+              card={participant.selectedCard}
+              size="sm"
+              variant="compact"
+              showTitle={true}
+              showDescription={false}
+              className="w-full h-full"
+            />
           </div>
           <div className="text-[10px] text-slate-600 line-clamp-2">{participant.selectedCard.description}</div>
           {participant.reflection && (
@@ -1192,12 +1201,16 @@ function ParticipantDetailModal({ participant, onClose }: { participant: Partici
         <div className="p-6">
           {participant.selectedCard ? (
             <div className="space-y-4">
-              <div className={`aspect-[4/2] rounded-xl bg-gradient-to-br ${participant.selectedCard.gradient} flex items-center justify-center text-white font-semibold text-2xl shadow-lg`}>
-                {participant.selectedCard.title}
-              </div>
-              <div className="text-center">
-                <div className="text-lg font-medium mb-2">{participant.selectedCard.title}</div>
-                <div className="text-slate-600 mb-4">{participant.selectedCard.description}</div>
+              <div className="flex justify-center">
+                <CardDisplay
+                  card={participant.selectedCard}
+                  size="lg"
+                  variant="detailed"
+                  showTitle={true}
+                  showDescription={true}
+                  showThemes={true}
+                  className="max-w-sm"
+                />
               </div>
               {participant.reflection && (
                 <div className="bg-slate-50 rounded-xl p-4">
@@ -1230,20 +1243,15 @@ function RoomSharedCardsPanel({
   sharedCards: SharedCard[];
   currentParticipant: string;
   canShare: boolean;
-  onShareCard: (card: Card) => void;
-  onReplaceCard: (cardIndex: number, newCard: Card) => void;
+  onShareCard: (card: CardType) => void;
+  onReplaceCard: (cardIndex: number, newCard: CardType) => void;
 }) {
   const [showCardSelector, setShowCardSelector] = useState(false);
   const [replacingCardIndex, setReplacingCardIndex] = useState<number | null>(null);
 
-  const sampleCards: Card[] = [
-    { id: "c1", title: "Mountain Peak", description: "Reaching new heights", gradient: "from-purple-500 to-pink-600" },
-    { id: "c2", title: "Ocean Wave", description: "Flow and adaptability", gradient: "from-cyan-500 to-blue-600" },
-    { id: "c3", title: "Forest Path", description: "Journey and discovery", gradient: "from-green-500 to-emerald-600" },
-    { id: "c4", title: "Sunrise", description: "New beginnings", gradient: "from-yellow-500 to-orange-600" },
-  ];
+  const sampleCards: CardType[] = getRandomCards(6);
 
-  const handleCardSelect = (card: Card) => {
+  const handleCardSelect = (card: CardType) => {
     if (replacingCardIndex !== null) {
       onReplaceCard(replacingCardIndex, card);
       setReplacingCardIndex(null);
@@ -1275,8 +1283,14 @@ function RoomSharedCardsPanel({
       <div className="space-y-2">
         {sharedCards.map((sharedCard, index) => (
           <div key={sharedCard.id} className="flex items-center gap-3 p-2 bg-white rounded-lg border border-black/5">
-            <div className={`w-12 h-8 rounded bg-gradient-to-br ${sharedCard.card.gradient} flex items-center justify-center text-white text-xs font-medium`}>
-              {sharedCard.card.title.split(' ')[0]}
+            <div className="w-12 h-8">
+              <CardDisplay
+                card={sharedCard.card}
+                size="sm"
+                variant="compact"
+                showTitle={false}
+                className="w-full h-full"
+              />
             </div>
             <div className="flex-1">
               <div className="text-xs font-medium">{sharedCard.card.title}</div>
@@ -1322,16 +1336,20 @@ function RoomSharedCardsPanel({
             <div className="p-4">
               <div className="grid grid-cols-2 gap-3">
                 {sampleCards.map(card => (
-                  <button
+                  <div
                     key={card.id}
-                    onClick={() => handleCardSelect(card)}
                     className="p-3 rounded-lg border border-black/10 hover:border-emerald-300 hover:bg-emerald-50 transition-colors"
                   >
-                    <div className={`aspect-[4/3] rounded-lg bg-gradient-to-br ${card.gradient} flex items-center justify-center text-white font-medium text-sm mb-2`}>
-                      {card.title}
-                    </div>
-                    <div className="text-xs text-slate-600">{card.description}</div>
-                  </button>
+                    <CardDisplay
+                      card={card}
+                      size="md"
+                      variant="detailed"
+                      showTitle={true}
+                      showDescription={true}
+                      onClick={() => handleCardSelect(card)}
+                      className="cursor-pointer"
+                    />
+                  </div>
                 ))}
               </div>
             </div>
@@ -2419,7 +2437,7 @@ const marketplaceItems: MarketplaceItem[] = [
 ];
 
 // Participant Cards data
-interface Card {
+interface LegacyCard {
   id: string;
   title: string;
   description: string;
@@ -2430,7 +2448,7 @@ interface ParticipantCard {
   id: string;
   name: string;
   status: "selecting" | "reflecting" | "completed";
-  selectedCard: Card | null;
+  selectedCard: CardType | null;
   reflection: string;
 }
 
@@ -2439,48 +2457,28 @@ const participantCards: ParticipantCard[] = [
     id: "pc1",
     name: "Dana Kim",
     status: "completed",
-    selectedCard: {
-      id: "card1",
-      title: "Mountain Peak",
-      description: "Reaching new heights, overcoming challenges",
-      gradient: "from-purple-500 to-pink-600"
-    },
-    reflection: "This mountain represents the leadership challenge I'm facing. I need to take it one step at a time."
+    selectedCard: getCardById("leadership") || null,
+    reflection: "This card represents the leadership challenge I'm facing. I need to take it one step at a time and guide others with confidence."
   },
   {
     id: "pc2", 
     name: "Ido Chen",
     status: "completed",
-    selectedCard: {
-      id: "card2",
-      title: "Bridge",
-      description: "Transition, connection, crossing boundaries", 
-      gradient: "from-blue-500 to-indigo-600"
-    },
-    reflection: "The bridge symbolizes my career transition. I'm in between where I was and where I want to be."
+    selectedCard: getCardById("choice") || null,
+    reflection: "The choice card symbolizes my career transition. I'm at a crossroads between where I was and where I want to be."
   },
   {
     id: "pc3",
     name: "Leah Miller",
     status: "completed", 
-    selectedCard: {
-      id: "card3",
-      title: "Sunrise",
-      description: "New beginnings, hope, fresh start",
-      gradient: "from-yellow-500 to-orange-600"
-    },
-    reflection: "Every sunrise is a new chance to start fresh. I choose to see opportunities instead of obstacles."
+    selectedCard: getCardById("everything_is_possible") || null,
+    reflection: "Everything is possible - this card reminds me that every sunrise is a new chance to start fresh. I choose to see opportunities instead of obstacles."
   },
   {
     id: "pc4",
     name: "Noa Wilson",
     status: "reflecting",
-    selectedCard: {
-      id: "card4", 
-      title: "Tree Roots",
-      description: "Foundation, grounding, stability",
-      gradient: "from-green-500 to-emerald-600"
-    },
+    selectedCard: getCardById("balance") || null,
     reflection: ""
   },
   {
@@ -2494,12 +2492,7 @@ const participantCards: ParticipantCard[] = [
     id: "pc6",
     name: "Sara Lopez", 
     status: "completed",
-    selectedCard: {
-      id: "card5",
-      title: "Ocean Wave",
-      description: "Flow, adaptability, power",
-      gradient: "from-cyan-500 to-blue-600"
-    },
-    reflection: "Like waves, I need to learn to flow with change instead of fighting against it."
+    selectedCard: getCardById("just_be") || null,
+    reflection: "Just be - like flowing water, I need to learn to be present and flow with change instead of fighting against it."
   }
 ];

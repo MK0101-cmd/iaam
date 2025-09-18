@@ -6,6 +6,9 @@ import {
   TrendingUp, Target, Lightbulb, Award, Share2
 } from "lucide-react";
 import { Button } from "./design-system/components";
+import { CardDisplay, CardStack } from "./components/CardDisplay";
+import { VoiceInterface } from "./components/VoiceInterface";
+import { allCards, getRandomCards, getCardsByCategory, getCardById, type Card } from "./data/cards";
 
 /*
   Participant Experience UI - Comprehensive mockup for POY participants
@@ -1857,12 +1860,16 @@ function JournalBody({
   const [newEntry, setNewEntry] = useState({ title: "", content: "", prompt: "" });
   const [aiJournalText, setAiJournalText] = useState("");
   const [suggestedCards, setSuggestedCards] = useState([
-    { id: 1, type: "visual", title: "Bridge", description: "How are you building connections?" },
+    { id: 1, type: "visual", title: "Choice", description: "The power of decision and taking responsibility", card: getCardById("choice") },
     { id: 2, type: "question", title: "What if?", description: "What if you tried a different approach?" },
     { id: 3, type: "quote", title: "Courage", description: "The only way to do great work is to love what you do" }
   ]);
   const [selectedCards, setSelectedCards] = useState<number[]>([]);
   const [reflectionText, setReflectionText] = useState("");
+  
+  // Voice interface state
+  const [isVoiceMode, setIsVoiceMode] = useState(false);
+  const [voiceTranscript, setVoiceTranscript] = useState("");
   
   // Goals state
   const [goals, setGoals] = useState([
@@ -1959,6 +1966,52 @@ function JournalBody({
     setIsEditingGoals(true);
   };
 
+  // Voice interface handlers
+  const handleVoiceTranscript = (transcript: string, isFinal: boolean) => {
+    if (isFinal) {
+      setAiJournalText(prev => prev + (prev ? ' ' : '') + transcript);
+      setVoiceTranscript('');
+    } else {
+      setVoiceTranscript(transcript);
+    }
+  };
+
+  const handleVoiceCommand = (command: string) => {
+    switch (command) {
+      case 'new_entry':
+        setIsWriting(true);
+        setAiJournalText('');
+        break;
+      case 'save_entry':
+        if (aiJournalText.trim()) {
+          // Create new journal entry
+          const newEntry = {
+            id: `voice-${Date.now()}`,
+            title: aiJournalText.split('.')[0].slice(0, 50) + '...',
+            content: aiJournalText,
+            date: new Date().toLocaleDateString(),
+            mood: 'Reflective',
+            tags: ['voice', 'journal'],
+            favorite: false,
+            card: suggestedCards[0]?.card || null
+          };
+          console.log('Voice entry saved:', newEntry);
+          setAiJournalText('');
+        }
+        break;
+      case 'clear_text':
+        setAiJournalText('');
+        setVoiceTranscript('');
+        break;
+      case 'random_card':
+        handleNewRandomCard();
+        break;
+      case 'read_back':
+        // This will be handled by the VoiceInterface component
+        break;
+    }
+  };
+
   if (isWriting) {
     return (
       <div className="p-6 overflow-auto">
@@ -2035,15 +2088,29 @@ function JournalBody({
                     </div>
                     
                     <div className="random-card-display">
-                      <div className={`random-card ${suggestedCards[0]?.type || 'visual'}`}>
-                        <div className="card-visual">
-                          <div className={`${suggestedCards[0]?.type || 'visual'}-icon`}>
-                            {suggestedCards[0]?.icon || '🌉'}
-                          </div>
+                      {suggestedCards[0]?.type === 'visual' && suggestedCards[0]?.card ? (
+                        <div className="w-48">
+                          <CardDisplay
+                            card={suggestedCards[0].card}
+                            size="md"
+                            variant="detailed"
+                            showTitle={true}
+                            showDescription={true}
+                            showThemes={false}
+                            className="w-full"
+                          />
                         </div>
-                        <div className="random-card-title">{suggestedCards[0]?.title || 'Bridge'}</div>
-                        <div className="random-card-desc">{suggestedCards[0]?.description || 'How are you building connections?'}</div>
-                      </div>
+                      ) : (
+                        <div className={`random-card ${suggestedCards[0]?.type || 'visual'}`}>
+                          <div className="card-visual">
+                            <div className={`${suggestedCards[0]?.type || 'visual'}-icon`}>
+                              {suggestedCards[0]?.icon || '🌉'}
+                            </div>
+                          </div>
+                          <div className="random-card-title">{suggestedCards[0]?.title || 'Bridge'}</div>
+                          <div className="random-card-desc">{suggestedCards[0]?.description || 'How are you building connections?'}</div>
+                        </div>
+                      )}
                       <button 
                         className="new-card-btn"
                         onClick={handleNewRandomCard}
@@ -2052,10 +2119,43 @@ function JournalBody({
                       </button>
                     </div>
                     
+                    {/* Voice Interface Toggle */}
+                    <div className="mb-4 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setIsVoiceMode(!isVoiceMode)}
+                          className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                            isVoiceMode 
+                              ? 'bg-blue-500 text-white' 
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          🎤 Voice Input
+                        </button>
+                        <span className="text-xs text-gray-600">
+                          {isVoiceMode ? 'Speak your thoughts' : 'Click to enable voice input'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Voice Interface */}
+                    {isVoiceMode && (
+                      <div className="mb-4">
+                        <VoiceInterface
+                          onTranscript={handleVoiceTranscript}
+                          onVoiceCommand={handleVoiceCommand}
+                          placeholder="Click the microphone and speak your journal entry..."
+                          showPlayback={true}
+                          continuous={false}
+                          className="voice-journal-interface"
+                        />
+                      </div>
+                    )}
+                    
                       <textarea 
                         placeholder="Write about your experiences, challenges, breakthroughs, or anything you'd like to explore..."
                         className="ai-journal-textarea"
-                        value={aiJournalText}
+                        value={aiJournalText + (voiceTranscript ? ' ' + voiceTranscript : '')}
                         onChange={(e) => setAiJournalText(e.target.value)}
                       />
                       <div className="ai-journal-actions">
@@ -2121,15 +2221,31 @@ function JournalBody({
                     
                     {entry.card && (
                       <div className="page-card">
-                        <div className={`card-display ${entry.card.type}`}>
-                          <div className="card-visual">
-                            <div className={`${entry.card.type}-icon`}>
-                              {entry.card.icon}
-                            </div>
+                        {'image' in entry.card ? (
+                          // New Card type with image
+                          <div className="w-full">
+                            <CardDisplay
+                              card={entry.card}
+                              size="sm"
+                              variant="detailed"
+                              showTitle={true}
+                              showDescription={true}
+                              showThemes={false}
+                              className="w-full"
+                            />
                           </div>
-                          <div className="card-display-title">{entry.card.title}</div>
-                          <div className="card-display-desc">{entry.card.description}</div>
-                        </div>
+                        ) : (
+                          // Legacy card format
+                          <div className={`card-display ${entry.card.type}`}>
+                            <div className="card-visual">
+                              <div className={`${entry.card.type || 'visual'}-icon`}>
+                                🎯
+                              </div>
+                            </div>
+                            <div className="card-display-title">{entry.card.title}</div>
+                            <div className="card-display-desc">{entry.card.description}</div>
+                          </div>
+                        )}
                       </div>
                     )}
                     
@@ -2362,20 +2478,20 @@ function getAvatarUrl(name: string): string {
 /* ——— Drag & Drop Composer ——— */
 function DragDropComposer() {
   const [tableCards, setTableCards] = useState<{
-    visual: SimpleCard | null;
-    question: SimpleCard | null;
-    quote: SimpleCard | null;
+    visual: Card | null;
+    question: Card | null;
+    quote: Card | null;
   }[]>(Array(3).fill({ visual: null, question: null, quote: null }));
 
-  const [draggedCard, setDraggedCard] = useState<{ card: SimpleCard; type: 'visual' | 'question' | 'quote' } | null>(null);
+  const [draggedCard, setDraggedCard] = useState<{ card: Card; type: 'visual' | 'question' | 'quote' } | null>(null);
   const [draggedPosition, setDraggedPosition] = useState<{ x: number; y: number } | null>(null);
 
-  const handleCardClick = (card: SimpleCard, type: 'visual' | 'question' | 'quote') => {
+  const handleCardClick = (card: Card, type: 'visual' | 'question' | 'quote') => {
     setDraggedCard({ card, type });
     setDraggedPosition({ x: 0, y: 0 });
   };
 
-  const handleMouseDown = (e: React.MouseEvent, card: SimpleCard, type: 'visual' | 'question' | 'quote') => {
+  const handleMouseDown = (e: React.MouseEvent, card: Card, type: 'visual' | 'question' | 'quote') => {
     e.preventDefault();
     setDraggedCard({ card, type });
     setDraggedPosition({ x: e.clientX, y: e.clientY });
@@ -2622,15 +2738,27 @@ function DragDropComposer() {
             transform: 'rotate(5deg)'
           }}
         >
-          <div className={`rounded-lg border-2 border-white shadow-lg ${
-            draggedCard.type === 'visual' ? 'bg-gradient-to-br from-blue-500 to-indigo-600' :
-            draggedCard.type === 'question' ? 'bg-purple-100 text-purple-800' :
-            'bg-amber-100 text-amber-800'
-          }`}>
-            <div className="px-3 py-2 text-sm font-medium">
-              {draggedCard.card.title}
+          {draggedCard.type === 'visual' ? (
+            <div className="w-24 h-16">
+              <CardDisplay
+                card={draggedCard.card}
+                size="sm"
+                variant="compact"
+                showTitle={true}
+                showDescription={false}
+                className="w-full h-full border-2 border-white shadow-lg"
+              />
             </div>
-          </div>
+          ) : (
+            <div className={`rounded-lg border-2 border-white shadow-lg px-3 py-2 ${
+              draggedCard.type === 'question' ? 'bg-purple-100 text-purple-800' :
+              'bg-amber-100 text-amber-800'
+            }`}>
+              <div className="text-sm font-medium">
+                {draggedCard.card.title}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -2645,13 +2773,13 @@ function CardPane({
   color 
 }: { 
   title: string; 
-  cards: SimpleCard[]; 
+  cards: Card[]; 
   type: 'visual' | 'question' | 'quote';
-  onCardClick: (card: SimpleCard, type: 'visual' | 'question' | 'quote') => void;
+  onCardClick: (card: Card, type: 'visual' | 'question' | 'quote') => void;
   color: string;
 }) {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
-  const [shuffledCards, setShuffledCards] = useState<SimpleCard[]>(cards);
+  const [shuffledCards, setShuffledCards] = useState<Card[]>(cards);
 
   const shuffleCards = () => {
     const shuffled = [...cards].sort(() => Math.random() - 0.5);
@@ -2659,7 +2787,7 @@ function CardPane({
     setExpandedIndex(null);
   };
 
-  const handleCardInteraction = (card: SimpleCard, index: number) => {
+  const handleCardInteraction = (card: Card, index: number) => {
     if (expandedIndex === index) {
       setExpandedIndex(null);
     } else {
@@ -2668,7 +2796,7 @@ function CardPane({
     }
   };
 
-  const handleMouseDown = (e: React.MouseEvent, card: SimpleCard, index: number) => {
+  const handleMouseDown = (e: React.MouseEvent, card: Card, index: number) => {
     e.preventDefault();
     setExpandedIndex(index);
     onCardClick(card, type);
@@ -2708,14 +2836,25 @@ function CardPane({
                 onClick={() => handleCardInteraction(card, index)}
                 onMouseDown={(e) => handleMouseDown(e, card, index)}
               >
-                <div className={`rounded-lg border border-black/10 p-2 h-full ${
-                  type === 'visual' ? 'bg-gradient-to-br from-blue-500 to-indigo-600 text-white' :
-                  type === 'question' ? 'bg-purple-100 text-purple-800' :
-                  'bg-amber-100 text-amber-800'
-                } ${expandedIndex === index ? 'ring-2 ring-blue-400' : ''}`}>
-                  <div className="text-xs font-medium mb-1">{card.title}</div>
-                  <div className="text-[10px] opacity-80 line-clamp-2">{card.description}</div>
-                </div>
+{type === 'visual' ? (
+                  <CardDisplay
+                    card={card}
+                    size="sm"
+                    variant="compact"
+                    showTitle={true}
+                    showDescription={false}
+                    className={`w-full h-full ${expandedIndex === index ? 'ring-2 ring-blue-400' : ''}`}
+                    isExpanded={expandedIndex === index}
+                  />
+                ) : (
+                  <div className={`w-full h-full rounded-lg border border-black/10 p-2 ${
+                    type === 'question' ? 'bg-purple-100 text-purple-800' :
+                    'bg-amber-100 text-amber-800'
+                  } ${expandedIndex === index ? 'ring-2 ring-blue-400' : ''}`}>
+                    <div className="text-xs font-medium mb-1">{card.title}</div>
+                    <div className="text-[10px] opacity-80 line-clamp-2">{card.description}</div>
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -3195,8 +3334,15 @@ function SessionParticipantCard({ participant }: { participant: SessionParticipa
       
       {participant.selectedCard ? (
         <div className="space-y-1">
-          <div className={`aspect-[4/3] rounded-lg bg-gradient-to-br ${participant.selectedCard.gradient} flex items-center justify-center text-white font-medium text-xs shadow-sm`}>
-            {participant.selectedCard.title}
+          <div className="aspect-[4/3]">
+            <CardDisplay
+              card={participant.selectedCard}
+              size="sm"
+              variant="compact"
+              showTitle={true}
+              showDescription={false}
+              className="w-full h-full"
+            />
           </div>
           <div className="text-[10px] text-slate-600 line-clamp-2">{participant.selectedCard.description}</div>
           {participant.reflection && (
@@ -3223,7 +3369,7 @@ interface JournalEntry {
   mood?: string;
   tags: string[];
   favorite: boolean;
-  card?: {
+  card?: Card | {
     type: 'visual' | 'question' | 'quote';
     title: string;
     description: string;
@@ -3273,12 +3419,7 @@ interface SessionParticipantCardType {
   id: string;
   name: string;
   status: "selecting" | "reflecting" | "completed";
-  selectedCard: {
-    id: string;
-    title: string;
-    description: string;
-    gradient: string;
-  } | null;
+  selectedCard: Card | null;
   reflection: string;
 }
 
@@ -3286,17 +3427,12 @@ const journalEntries: JournalEntry[] = [
   {
     id: "j1",
     title: "Breakthrough in Leadership Session",
-    content: "Today's session with Marcus was incredible. The card I drew - 'Bridge' - really spoke to me about my transition into management. I realized I've been afraid of letting go of my technical work, but maybe that's exactly what I need to do to be effective as a leader. The bridge isn't about carrying everything across - it's about creating a path for others.",
+    content: "Today's session with Marcus was incredible. The card I drew - 'Leadership' - really spoke to me about my transition into management. I realized I've been afraid of letting go of my technical work, but maybe that's exactly what I need to do to be effective as a leader. Leadership isn't about carrying everything - it's about guiding others to find their own path.",
     date: "Jan 8, 2024",
     mood: "Inspired",
     tags: ["leadership", "transition", "breakthrough"],
     favorite: true,
-    card: {
-      type: "visual",
-      title: "Bridge",
-      description: "How are you building connections?",
-      icon: "🌉"
-    }
+    card: getCardById("leadership")
   },
   {
     id: "j2", 
@@ -3331,17 +3467,12 @@ const journalEntries: JournalEntry[] = [
   {
     id: "j4",
     title: "New Year Intentions",
-    content: "Setting intentions rather than resolutions this year. Want to focus on: 1) Being more present in conversations, 2) Taking more creative risks, 3) Building deeper connections with my team. The 'word card' exercise from the workshop really helped me get clear on what matters.",
+    content: "Setting intentions for 2024. This year, I want to focus on being more present in my relationships, both at work and at home. The card that came up was 'Balance' - such a perfect reminder that success isn't just about achieving goals, it's about maintaining harmony in all areas of life.",
     date: "Jan 1, 2024",
     mood: "Hopeful",
     tags: ["intentions", "goals", "presence"],
     favorite: true,
-    card: {
-      type: "visual",
-      title: "Mountain",
-      description: "What challenges are you climbing?",
-      icon: "🏔️"
-    }
+    card: getCardById("balance")
   }
 ];
 
@@ -3509,6 +3640,10 @@ const groupParticipantCards: SessionParticipantCardType[] = [
       id: "card1",
       title: "Ocean Wave",
       description: "Flow, adaptability, power",
+      image: "/cards/ocean-wave.jpg",
+      category: "nature",
+      themes: ["flow", "adaptability", "power"],
+      keywords: ["ocean", "wave", "flow"],
       gradient: "from-cyan-500 to-blue-600"
     },
     reflection: "Like waves, I need to learn to flow with change instead of fighting against it."
@@ -3521,6 +3656,10 @@ const groupParticipantCards: SessionParticipantCardType[] = [
       id: "card2",
       title: "Sunrise",
       description: "New beginnings, hope, fresh start",
+      image: "/cards/sunrise.jpg",
+      category: "nature",
+      themes: ["new beginnings", "hope", "fresh start"],
+      keywords: ["sunrise", "dawn", "beginning"],
       gradient: "from-yellow-500 to-orange-600"
     },
     reflection: ""
@@ -3533,6 +3672,10 @@ const groupParticipantCards: SessionParticipantCardType[] = [
       id: "card3", 
       title: "Mountain Path",
       description: "Journey, direction, steady progress",
+      image: "/cards/mountain-path.jpg",
+      category: "nature",
+      themes: ["journey", "direction", "steady progress"],
+      keywords: ["mountain", "path", "journey"],
       gradient: "from-green-500 to-emerald-600"
     },
     reflection: "Every path has its challenges, but the journey teaches us who we're becoming."
@@ -3547,7 +3690,8 @@ const groupParticipantCards: SessionParticipantCardType[] = [
 ];
 
 // All session participants (for reference)
-const sessionParticipantCards: SessionParticipantCardType[] = [
+// Temporarily commented out to fix build issues
+/* const sessionParticipantCards: SessionParticipantCardType[] = [
   {
     id: "spc1",
     name: "Sarah Chen",
@@ -3615,32 +3759,133 @@ const sessionParticipantCards: SessionParticipantCardType[] = [
     },
     reflection: "Like waves, I need to learn to flow with change instead of fighting against it."
   }
+]; */
+
+// Demo decks for composer using real card images
+const visualDeck: Card[] = getCardsByCategory('visual').concat(getCardsByCategory('concept')).slice(0, 8);
+
+const questionDeck: Card[] = [
+  {
+    id: 'q1',
+    title: 'What stands out most?',
+    description: 'Observation-based reflection',
+    image: '/cards/Opints_of_view.png',
+    category: 'reflection',
+    themes: ['observation', 'awareness', 'perspective'],
+    gradient: 'from-teal-500 to-cyan-600',
+    keywords: ['observe', 'notice', 'perspective'],
+  },
+  {
+    id: 'q2',
+    title: 'What is changing for you?',
+    description: 'Transition prompt',
+    image: '/cards/Choice.png',
+    category: 'reflection',
+    themes: ['change', 'transition', 'growth'],
+    gradient: 'from-orange-500 to-red-500',
+    keywords: ['change', 'transition', 'growth'],
+  },
+  {
+    id: 'q3',
+    title: 'What would a first step look like?',
+    description: 'Action-oriented',
+    image: '/cards/Solutions.png',
+    category: 'action',
+    themes: ['action', 'steps', 'beginning'],
+    gradient: 'from-emerald-500 to-green-600',
+    keywords: ['action', 'step', 'beginning'],
+  },
+  {
+    id: 'q4',
+    title: 'What strength helps here?',
+    description: 'Values & strengths',
+    image: '/cards/Success.png',
+    category: 'reflection',
+    themes: ['strength', 'values', 'power'],
+    gradient: 'from-yellow-500 to-orange-600',
+    keywords: ['strength', 'values', 'power'],
+  },
+  {
+    id: 'q5',
+    title: 'What\'s another way to see this?',
+    description: 'Reframing',
+    image: '/cards/Opints_of_view.png',
+    category: 'concept',
+    themes: ['perspective', 'reframing', 'understanding'],
+    gradient: 'from-teal-500 to-cyan-600',
+    keywords: ['reframe', 'perspective', 'view'],
+  },
+  {
+    id: 'q6',
+    title: 'What are you learning?',
+    description: 'Growth lens',
+    image: '/cards/Learning.png',
+    category: 'concept',
+    themes: ['learning', 'growth', 'development'],
+    gradient: 'from-blue-500 to-indigo-600',
+    keywords: ['learning', 'growth', 'development'],
+  },
 ];
 
-// Demo decks for composer
-const visualDeck: { id:string; title:string; description:string; gradient:string }[] = [
-  { id:"v1", title:"Mountain Peak", description:"Reaching new heights, overcoming challenges", gradient:"from-purple-500 to-pink-600" },
-  { id:"v2", title:"Ocean Wave", description:"Flow, adaptability, power", gradient:"from-cyan-500 to-blue-600" },
-  { id:"v3", title:"Forest Path", description:"Journey, direction, discovery", gradient:"from-green-500 to-emerald-600" },
-  { id:"v4", title:"Sunrise", description:"New beginnings, hope", gradient:"from-yellow-500 to-orange-600" },
-  { id:"v5", title:"Bridge", description:"Transition, connection", gradient:"from-blue-500 to-indigo-600" },
-  { id:"v6", title:"Tree Roots", description:"Foundation, stability", gradient:"from-emerald-500 to-green-600" },
-];
-
-const questionDeck: { id:string; title:string; description:string }[] = [
-  { id:"q1", title:"What stands out most?", description:"Observation-based reflection" },
-  { id:"q2", title:"What is changing for you?", description:"Transition prompt" },
-  { id:"q3", title:"What would a first step look like?", description:"Action-oriented" },
-  { id:"q4", title:"What strength helps here?", description:"Values & strengths" },
-  { id:"q5", title:"What's another way to see this?", description:"Reframing" },
-  { id:"q6", title:"What are you learning?", description:"Growth lens" },
-];
-
-const quoteDeck: { id:string; title:string; description:string }[] = [
-  { id:"t1", title:"In the middle of difficulty lies opportunity.", description:"Albert Einstein" },
-  { id:"t2", title:"The cave you fear to enter holds the treasure you seek.", description:"Joseph Campbell" },
-  { id:"t3", title:"Be yourself; everyone else is already taken.", description:"Oscar Wilde" },
-  { id:"t4", title:"What lies behind us... lies within us.", description:"Emerson" },
-  { id:"t5", title:"Only those who risk going too far...", description:"T.S. Eliot" },
-  { id:"t6", title:"If you believe you can or can't...", description:"Henry Ford" },
+const quoteDeck: Card[] = [
+  {
+    id: 't1',
+    title: 'In the middle of difficulty lies opportunity.',
+    description: 'Albert Einstein',
+    image: '/cards/Solutions.png',
+    category: 'concept',
+    themes: ['opportunity', 'challenge', 'wisdom'],
+    gradient: 'from-emerald-500 to-green-600',
+    keywords: ['opportunity', 'difficulty', 'challenge'],
+  },
+  {
+    id: 't2',
+    title: 'The cave you fear to enter holds the treasure you seek.',
+    description: 'Joseph Campbell',
+    image: '/cards/Calling.png',
+    category: 'reflection',
+    themes: ['courage', 'fear', 'treasure'],
+    gradient: 'from-purple-500 to-pink-500',
+    keywords: ['courage', 'fear', 'treasure'],
+  },
+  {
+    id: 't3',
+    title: 'Be yourself; everyone else is already taken.',
+    description: 'Oscar Wilde',
+    image: '/cards/Just_be.png',
+    category: 'reflection',
+    themes: ['authenticity', 'individuality', 'being'],
+    gradient: 'from-green-400 to-blue-500',
+    keywords: ['authentic', 'yourself', 'unique'],
+  },
+  {
+    id: 't4',
+    title: 'What lies behind us and before us are tiny matters...',
+    description: 'Ralph Waldo Emerson',
+    image: '/cards/Everything_is_possible.png',
+    category: 'concept',
+    themes: ['potential', 'present', 'possibility'],
+    gradient: 'from-yellow-400 to-orange-500',
+    keywords: ['potential', 'present', 'within'],
+  },
+  {
+    id: 't5',
+    title: 'Only those who risk going too far can find how far they can go.',
+    description: 'T.S. Eliot',
+    image: '/cards/Leadership.png',
+    category: 'action',
+    themes: ['risk', 'courage', 'limits'],
+    gradient: 'from-indigo-500 to-purple-600',
+    keywords: ['risk', 'courage', 'limits'],
+  },
+  {
+    id: 't6',
+    title: 'Whether you think you can or think you can\'t, you\'re right.',
+    description: 'Henry Ford',
+    image: '/cards/Success.png',
+    category: 'concept',
+    themes: ['mindset', 'belief', 'success'],
+    gradient: 'from-yellow-500 to-orange-600',
+    keywords: ['belief', 'mindset', 'success'],
+  },
 ];
