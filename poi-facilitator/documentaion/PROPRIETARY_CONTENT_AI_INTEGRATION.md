@@ -3,51 +3,107 @@
 
 ## Executive Summary
 
-This document outlines comprehensive strategies for integrating Points of You proprietary content (visual cards, textual prompts, inspiration stories) into AI conversation flows while respecting intellectual property rights, maintaining content quality, and ensuring ethical usage. The solution addresses licensing, technical implementation, and business model considerations.
+This document outlines comprehensive strategies for integrating Points of You proprietary content into AI conversation flows while respecting intellectual property rights, maintaining content quality, and ensuring ethical usage. The solution addresses licensing, technical implementation, and business model considerations based on the actual POY content structure.
 
 ## Current Content Analysis
 
-### Content Types in POY Studio
+### Actual POY Content Structure
 
-Based on the frontend implementation analysis, the system handles multiple content types:
+Based on analysis of the proprietary POY content CSV (`poy_items.csv`), the system contains:
+
+**14 Thematic Cards:**
+- Solutions, Learning, Everything is Possible, Should Be, Choice, Calling, Just Be, Pause, Devotion, Leadership, Point of View, Intimacy, Balance, Success
+
+**Content Item Types per Card:**
+- `reflection_or_quote`: Inspirational stories, quotes, and reflective statements
+- `story_source`: Attribution for stories (Folk tale, Zen story, Sufi tale, etc.)
+- `citation_or_author`: Author attributions and sources
+- `question`: Reflective questions for self-inquiry
+- `other`: Continuation text and supplementary content
+
+### Updated Data Interfaces
 
 ```typescript
-interface ContentItem {
-  id: string;
-  type: "word" | "image" | "prompt" | "exercise" | "deck" | "template" | "visual";
-  title: string;
-  description: string;
-  content_data: any;
-  tags: string[];
-  author: string;
-  license: string;
-  is_proprietary: boolean;
-  usage_rights: string[];
+enum ContentKind {
+  REFLECTION_OR_QUOTE = "reflection_or_quote",
+  STORY_SOURCE = "story_source", 
+  CITATION_OR_AUTHOR = "citation_or_author",
+  QUESTION = "question",
+  OTHER = "other"
 }
 
-interface ProprietaryCard {
+interface POYContentItem {
   id: string;
-  title: string;
-  description: string;
-  visual_url?: string;
-  inspiration_story?: string;
-  reflection_prompts: string[];
-  themes: string[];
+  card_title: string;           // Maps to CSV "Title" column (Solutions, Learning, etc.)
+  content_kind: ContentKind;    // Maps to CSV "Kind" column
+  content_text: string;         // Maps to CSV "Content" column
+  author_or_source?: string;    // Maps to CSV "AuthorOrSource" column
+  image_file?: string;          // Maps to CSV "ImageFile" column
+  
+  // AI Integration fields
+  themes: string[];             // Derived from card_title groupings
   emotional_resonance: string[];
   usage_context: string[];
-  license_type: "poy_official" | "community" | "custom";
-  commercial_usage: boolean;
+  
+  // Licensing and access control
+  license_type: LicenseType;
+  access_tier: ContentTier;
+  creator_attribution: string;
+  ai_training_allowed: boolean;
+  
+  // Metadata for AI processing
+  semantic_embedding?: number[];
+  related_items: string[];
+  created_at: Date;
+  updated_at: Date;
+}
+
+// Aggregated card structure for AI processing
+interface POYCard {
+  id: string;
+  title: string;                // The card theme (Solutions, Learning, etc.)
+  description: string;          // Generated summary of all items
+  image_file?: string;          // Primary image for the card
+  
+  // Grouped content by type
+  stories: POYContentItem[];           // reflection_or_quote + story_source items
+  questions: POYContentItem[];         // question items  
+  quotes: POYContentItem[];            // citation_or_author items
+  other_content: POYContentItem[];     // other items
+  
+  // AI-friendly aggregations
+  all_content_text: string;           // Concatenated searchable text
+  primary_themes: string[];           // Main themes for this card
+  emotional_resonance: string[];      // Aggregated emotional tags
+  usage_contexts: string[];           // When/how to use this card
+  
+  // Licensing (inherited from most restrictive item)
+  license_type: LicenseType;
+  access_tier: ContentTier;
+  requires_attribution: boolean;
+  
+  // AI processing metadata
+  semantic_embedding: number[];
+  related_cards: string[];
+  usage_analytics: CardUsageAnalytics;
+}
+
+interface CardUsageAnalytics {
+  total_ai_interactions: number;
+  successful_coaching_sessions: number;
+  user_feedback_score: number;
+  most_effective_contexts: string[];
+  last_used: Date;
 }
 ```
 
-### Current Content Structure
+### POY Content Characteristics
 
-1. **Visual Cards**: Photo-based cards with metaphorical imagery
-2. **Word Cards**: Single words or short phrases for reflection
-3. **Prompts**: Open-ended questions for facilitation
-4. **Exercises**: Structured activities using POY methodology
-5. **Templates**: Pre-built session frameworks
-6. **Inspiration Stories**: Contextual narratives connected to cards
+1. **Thematic Cards**: 14 core themes with rich content collections
+2. **Story-Based Content**: Folk tales, parables, and inspirational narratives
+3. **Reflective Questions**: Deep inquiry prompts for coaching sessions
+4. **Wisdom Quotes**: Attributed quotes from notable figures
+5. **Multi-Modal Elements**: Text content with associated imagery
 
 ## Proprietary Content Integration Solutions
 
@@ -82,113 +138,173 @@ class ContentLicense:
     api_access_allowed: bool
     
 @dataclass
-class ProprietaryContent:
+class POYContentItem:
     id: str
-    title: str
-    content_type: str
-    description: str
-    visual_data: Optional[bytes] = None
-    text_content: Optional[str] = None
-    inspiration_story: Optional[str] = None
-    metadata: Dict = None
+    card_title: str
+    content_kind: str
+    content_text: str
+    author_or_source: Optional[str] = None
+    image_file: Optional[str] = None
+    themes: List[str] = None
+    emotional_resonance: List[str] = None
+    usage_context: List[str] = None
     license: ContentLicense = None
-    access_tier: ContentTier = ContentTier.FREE
-    creator_attribution: str = ""
+    access_tier: ContentTier = ContentTier.PROFESSIONAL
+    creator_attribution: str = "Points of You®"
     usage_analytics: Dict = None
 
-class ContentAccessManager:
+@dataclass
+class POYCard:
+    id: str
+    title: str
+    description: str
+    image_file: Optional[str] = None
+    stories: List[POYContentItem] = None
+    questions: List[POYContentItem] = None
+    quotes: List[POYContentItem] = None
+    other_content: List[POYContentItem] = None
+    all_content_text: str = ""
+    primary_themes: List[str] = None
+    emotional_resonance: List[str] = None
+    usage_contexts: List[str] = None
+    license: ContentLicense = None
+    access_tier: ContentTier = ContentTier.PROFESSIONAL
+    requires_attribution: bool = True
+    semantic_embedding: List[float] = None
+    related_cards: List[str] = None
+    usage_analytics: Dict = None
+
+class POYContentManager:
     def __init__(self):
-        self.license_registry = {}
+        self.content_items: Dict[str, POYContentItem] = {}
+        self.cards: Dict[str, POYCard] = {}
         self.usage_tracker = {}
     
-    def check_content_access(self, user_subscription: str, 
-                           content_id: str) -> bool:
-        """Check if user has access to specific content"""
-        content = self.get_content(content_id)
-        user_tier = self.get_user_tier(user_subscription)
+    def check_card_access(self, user_subscription: str, 
+                         card_title: str) -> bool:
+        """Check if user has access to specific POY card"""
+        # All POY content requires professional tier or higher
+        access_hierarchy = ["free", "professional", "enterprise", "poy_licensed"]
         
-        # Tier-based access control
-        if content.access_tier == ContentTier.FREE:
-            return True
-        elif content.access_tier == ContentTier.PROFESSIONAL:
-            return user_tier in ["professional", "enterprise"]
-        elif content.access_tier == ContentTier.ENTERPRISE:
-            return user_tier == "enterprise"
-        elif content.access_tier == ContentTier.OFFICIAL_POY:
-            return self.has_poy_license(user_subscription)
+        if user_subscription not in access_hierarchy:
+            return False
         
-        return False
+        # POY content requires professional or higher
+        required_level_index = access_hierarchy.index("professional")
+        user_level_index = access_hierarchy.index(user_subscription)
+        
+        return user_level_index >= required_level_index
     
-    def get_ai_safe_content(self, content_id: str) -> Dict:
-        """Return content formatted for AI consumption with proper attribution"""
-        content = self.get_content(content_id)
-        
-        if not content.license.ai_training_allowed:
-            # Return only metadata, not actual content
+    def get_ai_safe_card_content(self, card_title: str, user_subscription: str) -> Dict:
+        """Return card content formatted for AI consumption with proper licensing"""
+        if not self.check_card_access(user_subscription, card_title):
             return {
-                "id": content.id,
-                "title": content.title,
-                "description": content.description,
-                "themes": content.metadata.get("themes", []),
-                "usage_context": "proprietary_reference_only"
+                "card_title": card_title,
+                "access_denied": True,
+                "reason": "Insufficient access level - Professional tier required",
+                "available_themes": [card_title],  # Only theme info
+                "upgrade_required": True
             }
         
-        # Full content with attribution
+        card = self.cards.get(card_title)
+        if not card:
+            return {"error": "Card not found"}
+        
+        # Get grouped content
+        grouped_content = {
+            "stories": [{"text": item.content_text, "author": item.author_or_source} 
+                       for item in card.stories],
+            "questions": [{"text": item.content_text} 
+                         for item in card.questions],
+            "quotes": [{"text": item.content_text, "author": item.author_or_source} 
+                      for item in card.quotes],
+            "other": [{"text": item.content_text} 
+                     for item in card.other_content]
+        }
+        
+        # Collect attribution sources
+        attribution_sources = set()
+        for items in [card.stories, card.quotes]:
+            for item in items:
+                if item.author_or_source:
+                    attribution_sources.add(item.author_or_source)
+        
         ai_content = {
-            "id": content.id,
-            "title": content.title,
-            "description": content.description,
-            "content": content.text_content,
-            "inspiration_story": content.inspiration_story,
-            "metadata": content.metadata,
-            "attribution": content.creator_attribution,
-            "license_note": "Content used under license agreement"
+            "card_title": card_title,
+            "description": card.description,
+            "content_categories": grouped_content,
+            "combined_text": card.all_content_text,
+            "themes": card.primary_themes,
+            "emotional_resonance": card.emotional_resonance,
+            "usage_contexts": card.usage_contexts,
+            "attribution_required": list(attribution_sources),
+            "license_info": "Points of You® proprietary content",
+            "image_file": card.image_file,
+            "creator_attribution": "Points of You®"
         }
         
         # Track usage for licensing compliance
-        self.track_ai_usage(content_id, "ai_processing")
+        self.track_ai_usage(card_title, "ai_processing")
         
         return ai_content
+    
+    def load_from_csv_data(self, csv_data: List[Dict]) -> None:
+        """Load POY content from CSV data and create card structures"""
+        # Group items by card title
+        card_groups = {}
+        for row in csv_data:
+            card_title = row['Title']
+            if card_title not in card_groups:
+                card_groups[card_title] = []
+            card_groups[card_title].append(row)
+        
+        # Create cards and items
+        for card_title, items in card_groups.items():
+            self._create_card_from_items(card_title, items)
 ```
 
 ### 2. AI-Safe Content Transformation
 
 ```python
-class ContentTransformationService:
+class POYContentTransformationService:
     def __init__(self, openai_client):
         self.openai_client = openai_client
         self.transformation_cache = {}
     
-    async def create_inspired_content(self, proprietary_card: ProprietaryContent, 
+    async def create_inspired_content(self, poy_card: POYCard, 
                                     context: Dict) -> Dict:
         """
-        Create AI-generated content inspired by proprietary cards
+        Create AI-generated content inspired by POY cards
         without directly copying copyrighted material
         """
         
         # Extract themes and concepts (not copyrighted)
         inspiration_data = {
-            "themes": proprietary_card.metadata.get("themes", []),
-            "emotional_resonance": proprietary_card.metadata.get("emotional_resonance", []),
+            "themes": poy_card.primary_themes,
+            "emotional_resonance": poy_card.emotional_resonance,
+            "usage_contexts": poy_card.usage_contexts,
             "context_type": context.get("session_phase"),
             "participant_needs": context.get("participant_themes", [])
         }
         
         # Generate original content inspired by themes
         prompt = f"""
-        Create an original reflection prompt inspired by these themes: {inspiration_data['themes']}.
+        Create an original reflection prompt inspired by the Points of You card theme: {poy_card.title}.
         
+        Card themes: {inspiration_data['themes']}
+        Emotional resonance: {inspiration_data['emotional_resonance']}
         Context: {inspiration_data['context_type']} phase of a Points of You session
         Participant themes: {inspiration_data['participant_needs']}
         
         Guidelines:
         - Create completely original content
         - Maintain the reflective, open-ended style of Points of You methodology
-        - Focus on the emotional resonance: {inspiration_data['emotional_resonance']}
+        - Focus on the emotional resonance and themes
         - Avoid copying any existing proprietary content
-        - Generate 2-3 related open questions
+        - Generate 2-3 related open questions for deeper reflection
+        - Use metaphors and storytelling elements when appropriate
         
-        Format as JSON with: title, description, questions[], themes[]
+        Format as JSON with: title, description, questions[], themes[], suggested_usage[]
         """
         
         response = await self.openai_client.chat.completions.create(
@@ -204,40 +320,86 @@ class ContentTransformationService:
         
         # Add attribution and licensing info
         generated_content.update({
-            "inspired_by": proprietary_card.id,
+            "inspired_by_card": poy_card.title,
             "original_creator": "AI Generated",
             "license": "original_derived",
-            "attribution_note": f"Inspired by Points of You methodology and themes from '{proprietary_card.title}'"
+            "attribution_note": f"Inspired by Points of You® methodology and themes from '{poy_card.title}' card"
         })
         
         return generated_content
     
     async def create_contextual_story(self, card_themes: List[str], 
                                     participant_context: Dict) -> str:
-        """Generate original inspiration stories based on themes"""
+        """Generate original inspiration stories based on POY card themes"""
         
         prompt = f"""
-        Write a brief, inspiring story (150-200 words) that connects to these themes: {card_themes}
+        Write a brief, inspiring story (150-200 words) that connects to these Points of You themes: {card_themes}
         
         Participant context:
         - Current challenge: {participant_context.get('challenge', 'personal growth')}
         - Goal: {participant_context.get('goal', 'self-reflection')}
+        - Session phase: {participant_context.get('session_phase', 'exploration')}
         - Preferred metaphors: {participant_context.get('metaphor_preferences', [])}
         
-        Style: Warm, reflective, metaphorical, suitable for coaching conversation
-        End with an open question for reflection.
+        Style guidelines:
+        - Warm, reflective, metaphorical tone suitable for coaching
+        - Use storytelling elements similar to folk tales or parables
+        - Create original content, don't copy existing POY stories
+        - End with an open question for reflection
+        - Connect the story to the participant's current situation
+        
+        The story should inspire reflection and new perspectives while honoring the Points of You methodology.
         """
         
         response = await self.openai_client.chat.completions.create(
             model="gpt-4",
             messages=[
-                {"role": "system", "content": "You are a storyteller creating inspirational content for coaching sessions."},
+                {"role": "system", "content": "You are a storyteller creating inspirational content for Points of You coaching sessions."},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.7
         )
         
         return response.choices[0].message.content
+    
+    async def generate_coaching_questions(self, card_title: str, 
+                                        content_categories: Dict,
+                                        participant_input: str) -> List[str]:
+        """Generate coaching questions inspired by POY card content"""
+        
+        # Extract sample questions from the card content
+        existing_questions = [q["text"] for q in content_categories.get("questions", [])]
+        question_examples = existing_questions[:3] if existing_questions else []
+        
+        prompt = f"""
+        Generate 3-5 original coaching questions inspired by the Points of You '{card_title}' card theme.
+        
+        Participant shared: "{participant_input}"
+        
+        Example questions from this card theme (for style reference only - create new ones):
+        {question_examples}
+        
+        Guidelines:
+        - Create completely original questions
+        - Make them relevant to the participant's sharing
+        - Use the open-ended, reflective style of Points of You
+        - Focus on deepening self-awareness and new perspectives
+        - Avoid yes/no questions
+        - Build on the card's theme while addressing the participant's context
+        
+        Return as a JSON array of question strings.
+        """
+        
+        response = await self.openai_client.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "You are a Points of You certified coach creating original coaching questions."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.8
+        )
+        
+        return json.loads(response.choices[0].message.content)
 ```
 
 ### 3. Semantic Content Matching System
@@ -247,77 +409,117 @@ from sentence_transformers import SentenceTransformer
 import numpy as np
 from typing import List, Tuple
 
-class SemanticContentMatcher:
+class POYSemanticMatcher:
     def __init__(self):
         self.encoder = SentenceTransformer('all-MiniLM-L6-v2')
-        self.content_embeddings = {}
-        self.proprietary_index = {}
+        self.card_embeddings = {}
+        self.poy_card_index = {}
     
-    def index_proprietary_content(self, content_items: List[ProprietaryContent]):
-        """Create semantic index of proprietary content themes and concepts"""
-        for content in content_items:
-            # Index only metadata and themes, not full content
+    def index_poy_cards(self, poy_cards: List[POYCard]):
+        """Create semantic index of POY cards for theme matching"""
+        for card in poy_cards:
+            # Index card themes, emotional resonance, and usage contexts
             indexable_text = f"""
-            {content.title} {content.description}
-            Themes: {' '.join(content.metadata.get('themes', []))}
-            Context: {' '.join(content.metadata.get('usage_context', []))}
-            Emotional: {' '.join(content.metadata.get('emotional_resonance', []))}
+            {card.title} {card.description}
+            Themes: {' '.join(card.primary_themes)}
+            Emotional resonance: {' '.join(card.emotional_resonance)}
+            Usage contexts: {' '.join(card.usage_contexts)}
+            Content summary: {card.all_content_text[:500]}
             """
             
             embedding = self.encoder.encode([indexable_text])[0]
-            self.content_embeddings[content.id] = embedding
-            self.proprietary_index[content.id] = {
-                "title": content.title,
-                "themes": content.metadata.get('themes', []),
-                "license": content.license,
-                "access_tier": content.access_tier
+            self.card_embeddings[card.title] = embedding
+            self.poy_card_index[card.title] = {
+                "title": card.title,
+                "themes": card.primary_themes,
+                "emotional_resonance": card.emotional_resonance,
+                "usage_contexts": card.usage_contexts,
+                "license": card.license,
+                "access_tier": card.access_tier,
+                "requires_attribution": card.requires_attribution
             }
     
-    def find_thematically_similar(self, query: str, 
-                                 user_access_level: str,
-                                 top_k: int = 5) -> List[Tuple[str, float, Dict]]:
-        """Find proprietary content with similar themes for inspiration"""
+    def find_thematically_similar_cards(self, query: str, 
+                                       user_access_level: str,
+                                       top_k: int = 5) -> List[Tuple[str, float, Dict]]:
+        """Find POY cards with similar themes for coaching inspiration"""
         
         query_embedding = self.encoder.encode([query])[0]
         similarities = []
         
-        for content_id, content_embedding in self.content_embeddings.items():
-            content_info = self.proprietary_index[content_id]
+        for card_title, card_embedding in self.card_embeddings.items():
+            card_info = self.poy_card_index[card_title]
             
             # Check access permissions
-            if not self._check_access(content_info, user_access_level):
+            if not self._check_poy_access(card_info, user_access_level):
                 continue
             
-            similarity = np.dot(query_embedding, content_embedding) / (
-                np.linalg.norm(query_embedding) * np.linalg.norm(content_embedding)
+            similarity = np.dot(query_embedding, card_embedding) / (
+                np.linalg.norm(query_embedding) * np.linalg.norm(card_embedding)
             )
             
-            similarities.append((content_id, similarity, content_info))
+            similarities.append((card_title, similarity, card_info))
         
         # Sort by similarity and return top matches
         similarities.sort(key=lambda x: x[1], reverse=True)
         return similarities[:top_k]
     
-    def _check_access(self, content_info: Dict, user_access_level: str) -> bool:
-        """Check if user has access to this content tier"""
+    def find_cards_by_emotional_resonance(self, emotional_themes: List[str],
+                                        user_access_level: str) -> List[str]:
+        """Find POY cards that match specific emotional themes"""
+        matching_cards = []
+        
+        for card_title, card_info in self.poy_card_index.items():
+            if not self._check_poy_access(card_info, user_access_level):
+                continue
+                
+            card_emotions = card_info.get('emotional_resonance', [])
+            if any(emotion in card_emotions for emotion in emotional_themes):
+                matching_cards.append(card_title)
+        
+        return matching_cards
+    
+    def find_cards_by_usage_context(self, context: str,
+                                   user_access_level: str) -> List[str]:
+        """Find POY cards suitable for specific usage contexts"""
+        matching_cards = []
+        
+        for card_title, card_info in self.poy_card_index.items():
+            if not self._check_poy_access(card_info, user_access_level):
+                continue
+                
+            usage_contexts = card_info.get('usage_contexts', [])
+            if context in usage_contexts:
+                matching_cards.append(card_title)
+        
+        return matching_cards
+    
+    def _check_poy_access(self, card_info: Dict, user_access_level: str) -> bool:
+        """Check if user has access to POY cards (requires professional tier or higher)"""
         access_hierarchy = {
-            "free": ["free"],
-            "professional": ["free", "professional"], 
-            "enterprise": ["free", "professional", "enterprise"],
-            "poy_licensed": ["free", "professional", "enterprise", "official_poy"]
+            "free": [],  # No access to POY content
+            "professional": ["professional"], 
+            "enterprise": ["professional", "enterprise"],
+            "poy_licensed": ["professional", "enterprise", "official_poy"]
         }
         
-        allowed_tiers = access_hierarchy.get(user_access_level, ["free"])
-        return content_info["access_tier"].value in allowed_tiers
+        allowed_tiers = access_hierarchy.get(user_access_level, [])
+        card_tier = card_info.get("access_tier", "professional")
+        
+        # POY cards default to professional tier
+        if card_tier == "professional":
+            return len(allowed_tiers) > 0
+        else:
+            return card_tier in allowed_tiers
 ```
 
 ### 4. Conversation Flow Integration
 
 ```python
-class ProprietaryAwareAICoach:
-    def __init__(self, content_manager: ContentAccessManager,
-                 transformer: ContentTransformationService,
-                 matcher: SemanticContentMatcher):
+class POYAwareAICoach:
+    def __init__(self, content_manager: POYContentManager,
+                 transformer: POYContentTransformationService,
+                 matcher: POYSemanticMatcher):
         self.content_manager = content_manager
         self.transformer = transformer
         self.matcher = matcher
@@ -328,82 +530,104 @@ class ProprietaryAwareAICoach:
                                        session_context: Dict,
                                        user_subscription: str) -> Dict:
         """
-        Generate coaching response that appropriately uses proprietary content
+        Generate coaching response using POY cards appropriately based on access level
         """
         
-        # Analyze participant input for themes
+        # Analyze participant input for themes and emotional content
         themes = await self._extract_themes(participant_input)
+        emotions = await self._extract_emotional_themes(participant_input)
         
-        # Find relevant proprietary content (respecting access levels)
-        similar_content = self.matcher.find_thematically_similar(
+        # Find relevant POY cards (respecting access levels)
+        similar_cards = self.matcher.find_thematically_similar_cards(
             participant_input, 
             user_subscription,
             top_k=3
         )
         
         response_strategy = await self._determine_response_strategy(
-            themes, similar_content, user_subscription
+            themes, similar_cards, user_subscription
         )
         
-        if response_strategy == "direct_proprietary":
-            # User has access to proprietary content
-            return await self._generate_with_proprietary_content(
-                participant_input, similar_content[0], session_context
+        if response_strategy == "direct_poy_content":
+            # User has access to POY content
+            return await self._generate_with_poy_content(
+                participant_input, similar_cards[0], session_context
             )
         
         elif response_strategy == "inspired_original":
-            # Generate original content inspired by proprietary themes
+            # Generate original content inspired by POY themes
             return await self._generate_inspired_response(
-                participant_input, similar_content, session_context
+                participant_input, similar_cards, session_context
             )
         
         else:
-            # Use only free/open content
-            return await self._generate_open_content_response(
-                participant_input, session_context
+            # Use only free/open content or upgrade prompt
+            return await self._generate_upgrade_response(
+                participant_input, session_context, similar_cards
             )
     
-    async def _generate_with_proprietary_content(self,
-                                               participant_input: str,
-                                               content_match: Tuple,
-                                               session_context: Dict) -> Dict:
-        """Generate response using licensed proprietary content"""
+    async def _generate_with_poy_content(self,
+                                       participant_input: str,
+                                       card_match: Tuple,
+                                       session_context: Dict) -> Dict:
+        """Generate response using licensed POY card content"""
         
-        content_id, similarity, content_info = content_match
-        proprietary_content = self.content_manager.get_ai_safe_content(content_id)
+        card_title, similarity, card_info = card_match
+        poy_content = self.content_manager.get_ai_safe_card_content(
+            card_title, session_context.get('user_subscription', 'professional')
+        )
+        
+        if poy_content.get('access_denied'):
+            return poy_content  # Return access denied response
+        
+        # Select appropriate content based on session phase
+        session_phase = session_context.get('current_phase', 'exploration')
+        selected_content = self._select_content_for_phase(poy_content, session_phase)
         
         prompt = f"""
-        Based on the Points of You card '{proprietary_content['title']}' and its themes,
-        provide a coaching response to: "{participant_input}"
+        You are facilitating a Points of You coaching session using the '{card_title}' card.
         
-        Card context: {proprietary_content['description']}
-        Card themes: {proprietary_content.get('themes', [])}
+        Participant shared: "{participant_input}"
+        Session phase: {session_phase}
+        
+        Card content available:
+        - Stories: {len(poy_content['content_categories']['stories'])} available
+        - Questions: {len(poy_content['content_categories']['questions'])} available
+        - Quotes: {len(poy_content['content_categories']['quotes'])} available
+        
+        Selected content for this response: {selected_content}
         
         Guidelines:
-        - Reference the card appropriately with attribution
-        - Ask open-ended questions that build on the card's themes
-        - Maintain the Points of You coaching style
+        - Use the Points of You methodology and coaching style
+        - Reference the card theme naturally in your response
+        - Draw inspiration from the selected content without direct copying
+        - Ask 1-2 powerful, open-ended questions
         - Include a gentle challenge or reframe if appropriate
+        - Maintain warm, reflective tone
         
-        Attribution: {proprietary_content['attribution']}
+        Provide a coaching response that honors the POY methodology while being authentic to the participant's sharing.
         """
         
         # Track usage for licensing compliance
-        self.content_manager.track_ai_usage(content_id, "coaching_response")
+        self.content_manager.track_ai_usage(card_title, "coaching_response")
         
         response = await self.openai_client.chat.completions.create(
             model="gpt-4",
             messages=[
-                {"role": "system", "content": "You are a Points of You certified coach."},
+                {"role": "system", "content": "You are a certified Points of You coach and facilitator."},
                 {"role": "user", "content": prompt}
             ]
         )
         
         return {
             "response": response.choices[0].message.content,
-            "content_attribution": proprietary_content['attribution'],
-            "license_info": "Used under Points of You license",
-            "content_source": "proprietary_licensed"
+            "card_used": card_title,
+            "content_attribution": poy_content['creator_attribution'],
+            "license_info": "Points of You® proprietary content used under license",
+            "content_source": "poy_licensed",
+            "similarity_score": similarity,
+            "image_file": poy_content.get('image_file'),
+            "themes": card_info.get('themes', [])
         }
     
     async def _generate_inspired_response(self,
@@ -726,36 +950,91 @@ class ContentRevenueManager:
 ### Database Schema for Content Management
 
 ```sql
--- Content licensing and management
-CREATE TABLE content_items (
+-- POY Content items table (matches CSV structure)
+CREATE TABLE poy_content_items (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    title VARCHAR(255) NOT NULL,
-    description TEXT,
-    content_type VARCHAR(50) NOT NULL,
-    content_data JSONB NOT NULL,
-    visual_url VARCHAR(500),
-    inspiration_story TEXT,
-    themes TEXT[],
-    emotional_resonance TEXT[],
-    usage_context TEXT[],
-    creator_id UUID REFERENCES users(id),
-    license_type VARCHAR(50) NOT NULL,
-    access_tier VARCHAR(50) NOT NULL,
-    commercial_usage BOOLEAN DEFAULT false,
-    ai_training_allowed BOOLEAN DEFAULT false,
-    attribution_required BOOLEAN DEFAULT true,
+    card_title VARCHAR(255) NOT NULL,           -- Maps to CSV "Title"
+    content_kind VARCHAR(50) NOT NULL,          -- Maps to CSV "Kind" 
+    content_text TEXT NOT NULL,                 -- Maps to CSV "Content"
+    author_or_source VARCHAR(255),              -- Maps to CSV "AuthorOrSource"
+    image_file VARCHAR(255),                    -- Maps to CSV "ImageFile"
+    
+    -- AI Integration fields
+    themes TEXT[] DEFAULT '{}',
+    emotional_resonance TEXT[] DEFAULT '{}',
+    usage_context TEXT[] DEFAULT '{}',
+    
+    -- Licensing
+    license_type VARCHAR(50) NOT NULL DEFAULT 'poy_official',
+    access_tier VARCHAR(50) NOT NULL DEFAULT 'professional',
+    creator_attribution VARCHAR(255) DEFAULT 'Points of You®',
+    ai_training_allowed BOOLEAN DEFAULT true,
+    
+    -- Processing metadata
+    semantic_embedding vector(384),
+    related_items UUID[] DEFAULT '{}',
+    processing_notes JSONB DEFAULT '{}',
+    
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Content usage tracking
-CREATE TABLE content_usage_log (
+-- Aggregated cards table (for AI processing)
+CREATE TABLE poy_cards (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    content_id UUID REFERENCES content_items(id),
+    title VARCHAR(255) UNIQUE NOT NULL,         -- Card theme name
+    description TEXT,                           -- Generated summary
+    image_file VARCHAR(255),                    -- Primary image
+    
+    -- Content aggregations
+    total_items INTEGER DEFAULT 0,
+    story_items_count INTEGER DEFAULT 0,
+    question_items_count INTEGER DEFAULT 0,
+    quote_items_count INTEGER DEFAULT 0,
+    
+    -- AI processing fields  
+    all_content_text TEXT,                      -- Searchable content
+    primary_themes TEXT[] DEFAULT '{}',
+    emotional_resonance TEXT[] DEFAULT '{}',
+    usage_contexts TEXT[] DEFAULT '{}',
+    
+    -- Licensing (most restrictive from items)
+    license_type VARCHAR(50) NOT NULL DEFAULT 'poy_official',
+    access_tier VARCHAR(50) NOT NULL DEFAULT 'professional',
+    requires_attribution BOOLEAN DEFAULT true,
+    
+    -- AI metadata
+    semantic_embedding vector(384),
+    related_cards UUID[] DEFAULT '{}',
+    
+    -- Analytics
+    total_ai_interactions INTEGER DEFAULT 0,
+    successful_sessions INTEGER DEFAULT 0,
+    user_feedback_score DECIMAL(3,2) DEFAULT 0.0,
+    most_effective_contexts TEXT[] DEFAULT '{}',
+    last_used TIMESTAMP WITH TIME ZONE,
+    
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Relationship table between cards and items
+CREATE TABLE poy_card_items (
+    card_id UUID REFERENCES poy_cards(id) ON DELETE CASCADE,
+    item_id UUID REFERENCES poy_content_items(id) ON DELETE CASCADE,
+    item_order INTEGER DEFAULT 0,
+    PRIMARY KEY (card_id, item_id)
+);
+
+-- POY Content usage tracking
+CREATE TABLE poy_content_usage_log (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    card_title VARCHAR(255),                    -- POY card used
+    content_item_id UUID REFERENCES poy_content_items(id),
     user_id UUID REFERENCES users(id),
     organization_id UUID REFERENCES organizations(id),
     session_id UUID REFERENCES sessions(id),
-    usage_type VARCHAR(50) NOT NULL,
+    usage_type VARCHAR(50) NOT NULL,            -- ai_processing, display, download, etc.
     timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     ip_address INET,
     user_agent TEXT,
@@ -775,11 +1054,11 @@ CREATE TABLE license_agreements (
     revenue_sharing JSONB DEFAULT '{}'
 );
 
--- Revenue tracking
-CREATE TABLE content_revenue (
+-- POY Revenue tracking
+CREATE TABLE poy_content_revenue (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    content_id UUID REFERENCES content_items(id),
-    creator_id UUID REFERENCES users(id),
+    card_title VARCHAR(255),                    -- POY card
+    content_item_id UUID REFERENCES poy_content_items(id),
     period_start DATE NOT NULL,
     period_end DATE NOT NULL,
     total_revenue DECIMAL(10,2) NOT NULL,
@@ -787,21 +1066,22 @@ CREATE TABLE content_revenue (
     calculated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Content embeddings for semantic search
-CREATE TABLE content_embeddings (
-    content_id UUID PRIMARY KEY REFERENCES content_items(id),
-    embedding vector(384), -- Sentence transformer dimension
-    embedding_model VARCHAR(100) NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+-- Create indexes for performance
+CREATE INDEX idx_poy_content_items_card_title ON poy_content_items(card_title);
+CREATE INDEX idx_poy_content_items_kind ON poy_content_items(content_kind);
+CREATE INDEX idx_poy_content_items_themes ON poy_content_items USING GIN(themes);
+CREATE INDEX idx_poy_content_items_embedding ON poy_content_items USING ivfflat (semantic_embedding vector_cosine_ops);
 
--- Create indexes
-CREATE INDEX idx_content_items_license_type ON content_items(license_type);
-CREATE INDEX idx_content_items_access_tier ON content_items(access_tier);
-CREATE INDEX idx_content_items_themes ON content_items USING GIN(themes);
-CREATE INDEX idx_content_usage_log_content_id ON content_usage_log(content_id);
-CREATE INDEX idx_content_usage_log_timestamp ON content_usage_log(timestamp);
-CREATE INDEX idx_content_embeddings_vector ON content_embeddings USING ivfflat (embedding vector_cosine_ops);
+CREATE INDEX idx_poy_cards_title ON poy_cards(title);
+CREATE INDEX idx_poy_cards_themes ON poy_cards USING GIN(primary_themes);
+CREATE INDEX idx_poy_cards_embedding ON poy_cards USING ivfflat (semantic_embedding vector_cosine_ops);
+CREATE INDEX idx_poy_cards_emotional ON poy_cards USING GIN(emotional_resonance);
+CREATE INDEX idx_poy_cards_usage_contexts ON poy_cards USING GIN(usage_contexts);
+
+CREATE INDEX idx_poy_usage_log_card_title ON poy_content_usage_log(card_title);
+CREATE INDEX idx_poy_usage_log_timestamp ON poy_content_usage_log(timestamp);
+CREATE INDEX idx_poy_usage_log_user ON poy_content_usage_log(user_id);
+CREATE INDEX idx_poy_usage_log_org ON poy_content_usage_log(organization_id);
 ```
 
 ### API Endpoints
@@ -814,76 +1094,156 @@ from .dependencies import get_current_user, check_content_access
 router = APIRouter(prefix="/api/v1/content", tags=["content"])
 
 @router.get("/search")
-async def search_content(
+async def search_poy_cards(
     query: str,
-    content_type: Optional[str] = None,
-    access_tier: Optional[str] = None,
+    emotional_themes: Optional[List[str]] = None,
+    usage_context: Optional[str] = None,
     limit: int = 20,
     current_user = Depends(get_current_user)
 ):
-    """Search content with semantic matching and access control"""
+    """Search POY cards with semantic matching and access control"""
     
     # Check user's access level
     user_access_level = get_user_access_level(current_user)
     
     # Perform semantic search
-    matcher = SemanticContentMatcher()
-    results = matcher.find_thematically_similar(
+    matcher = POYSemanticMatcher()
+    results = matcher.find_thematically_similar_cards(
         query, user_access_level, top_k=limit
     )
+    
+    # Filter by additional criteria if provided
+    if emotional_themes:
+        emotional_matches = matcher.find_cards_by_emotional_resonance(
+            emotional_themes, user_access_level
+        )
+        # Intersect with semantic results
+        results = [r for r in results if r[0] in emotional_matches]
+    
+    if usage_context:
+        context_matches = matcher.find_cards_by_usage_context(
+            usage_context, user_access_level
+        )
+        results = [r for r in results if r[0] in context_matches]
     
     return {
         "results": results,
         "user_access_level": user_access_level,
-        "total_found": len(results)
+        "total_found": len(results),
+        "available_cards": len(matcher.poy_card_index) if user_access_level != "free" else 0
     }
 
-@router.get("/{content_id}")
-async def get_content(
-    content_id: str,
+@router.get("/cards/{card_title}")
+async def get_poy_card(
+    card_title: str,
     current_user = Depends(get_current_user)
 ):
-    """Get specific content with access control"""
+    """Get specific POY card with access control"""
     
-    content_manager = ContentAccessManager()
+    content_manager = POYContentManager()
     
     # Check access permissions
-    if not content_manager.check_content_access(
-        current_user.subscription_tier, content_id
+    if not content_manager.check_card_access(
+        current_user.subscription_tier, card_title
     ):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Insufficient access rights for this content"
+            detail="Professional subscription required for POY content access"
         )
     
-    # Get content for AI usage
-    content = content_manager.get_ai_safe_content(content_id)
+    # Get card content for AI usage
+    card_content = content_manager.get_ai_safe_card_content(
+        card_title, current_user.subscription_tier
+    )
     
     # Track usage
-    await content_manager.track_ai_usage(content_id, "api_access")
+    await content_manager.track_ai_usage(card_title, "api_access")
     
-    return content
+    return card_content
+
+@router.get("/cards")
+async def list_available_cards(
+    current_user = Depends(get_current_user)
+):
+    """List all POY cards available to user based on subscription"""
+    
+    content_manager = POYContentManager()
+    user_access_level = get_user_access_level(current_user)
+    
+    if user_access_level == "free":
+        return {
+            "available_cards": [],
+            "message": "Professional subscription required for POY content access",
+            "upgrade_required": True
+        }
+    
+    # Get all available cards for user's tier
+    all_cards = content_manager.get_available_cards(user_access_level)
+    
+    return {
+        "available_cards": all_cards,
+        "total_count": len(all_cards),
+        "user_access_level": user_access_level
+    }
 
 @router.post("/ai-coaching")
-async def ai_coaching_with_content(
+async def ai_coaching_with_poy_content(
     request: CoachingRequest,
     current_user = Depends(get_current_user)
 ):
-    """Generate AI coaching response using proprietary content appropriately"""
+    """Generate AI coaching response using POY content appropriately"""
     
-    coach = ProprietaryAwareAICoach(
-        ContentAccessManager(),
-        ContentTransformationService(openai_client),
-        SemanticContentMatcher()
+    coach = POYAwareAICoach(
+        POYContentManager(),
+        POYContentTransformationService(openai_client),
+        POYSemanticMatcher()
     )
+    
+    # Add user subscription to session context
+    session_context = request.session_context or {}
+    session_context['user_subscription'] = current_user.subscription_tier
     
     response = await coach.generate_coaching_response(
         request.participant_input,
-        request.session_context,
+        session_context,
         current_user.subscription_tier
     )
     
     return response
+
+@router.post("/generate-inspired-content")
+async def generate_inspired_content(
+    request: ContentGenerationRequest,
+    current_user = Depends(get_current_user)
+):
+    """Generate original content inspired by POY card themes"""
+    
+    if current_user.subscription_tier == "free":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Professional subscription required for content generation"
+        )
+    
+    transformer = POYContentTransformationService(openai_client)
+    content_manager = POYContentManager()
+    
+    # Get the POY card for inspiration
+    card_content = content_manager.get_ai_safe_card_content(
+        request.card_title, current_user.subscription_tier
+    )
+    
+    if card_content.get('access_denied'):
+        return card_content
+    
+    # Generate inspired content
+    inspired_content = await transformer.create_inspired_content(
+        card_content, request.context
+    )
+    
+    # Track usage
+    await content_manager.track_ai_usage(request.card_title, "content_generation")
+    
+    return inspired_content
 
 @router.get("/usage/compliance")
 async def check_usage_compliance(
@@ -989,30 +1349,155 @@ MARKETPLACE_REVENUE_MODEL = {
 - **Content Access Logs**: Secure logging with retention policies
 - **Cross-Border Compliance**: GDPR, CCPA compliance for international content usage
 
+## CSV to Database Migration Strategy
+
+### Migration Implementation
+
+```python
+class POYCSVMigrator:
+    def __init__(self, db_connection):
+        self.db = db_connection
+        self.embedding_service = SentenceTransformer('all-MiniLM-L6-v2')
+        self.content_analyzer = POYContentAnalyzer()
+    
+    async def migrate_csv_to_database(self, csv_file_path: str) -> Dict[str, int]:
+        """Migrate POY CSV data to the new database structure"""
+        import pandas as pd
+        
+        df = pd.read_csv(csv_file_path)
+        
+        stats = {
+            "items_migrated": 0,
+            "cards_created": 0,
+            "embeddings_generated": 0,
+            "errors": 0
+        }
+        
+        # Group by card title (Title column)
+        card_groups = df.groupby('Title')
+        
+        for card_title, group in card_groups:
+            try:
+                # Create card record
+                card_id = await self._create_card_record(card_title, group)
+                stats["cards_created"] += 1
+                
+                # Create item records
+                for _, row in group.iterrows():
+                    item_id = await self._create_item_record(row, card_id)
+                    stats["items_migrated"] += 1
+                
+                # Generate embeddings
+                await self._generate_card_embeddings(card_id, card_title)
+                stats["embeddings_generated"] += 1
+                
+            except Exception as e:
+                print(f"Error migrating card {card_title}: {e}")
+                stats["errors"] += 1
+        
+        return stats
+    
+    async def _create_card_record(self, card_title: str, group_df) -> str:
+        """Create aggregated card record from CSV group"""
+        
+        # Combine all content for analysis
+        all_content = group_df['Content'].fillna('').str.cat(sep=' ')
+        description = self._generate_card_description(card_title, group_df)
+        
+        # Get primary image
+        image_file = group_df['ImageFile'].dropna().iloc[0] if not group_df['ImageFile'].dropna().empty else None
+        
+        # Count items by type
+        kind_counts = group_df['Kind'].value_counts()
+        
+        # Extract themes and emotional resonance
+        themes = self.content_analyzer.extract_themes(all_content)
+        emotional_resonance = self.content_analyzer.extract_emotional_resonance(all_content)
+        usage_contexts = self.content_analyzer.determine_usage_contexts(card_title, group_df)
+        
+        card_data = {
+            'title': card_title,
+            'description': description,
+            'image_file': image_file,
+            'total_items': len(group_df),
+            'story_items_count': kind_counts.get('reflection_or_quote', 0) + kind_counts.get('story_source', 0),
+            'question_items_count': kind_counts.get('question', 0),
+            'quote_items_count': kind_counts.get('citation_or_author', 0),
+            'all_content_text': all_content,
+            'primary_themes': [card_title] + themes,
+            'emotional_resonance': emotional_resonance,
+            'usage_contexts': usage_contexts,
+            'license_type': 'poy_official',
+            'access_tier': 'professional',
+            'requires_attribution': True
+        }
+        
+        # Insert card
+        query = """
+        INSERT INTO poy_cards (title, description, image_file, total_items, 
+                              story_items_count, question_items_count, quote_items_count,
+                              all_content_text, primary_themes, emotional_resonance, 
+                              usage_contexts, license_type, access_tier, requires_attribution)
+        VALUES (%(title)s, %(description)s, %(image_file)s, %(total_items)s,
+                %(story_items_count)s, %(question_items_count)s, %(quote_items_count)s,
+                %(all_content_text)s, %(primary_themes)s, %(emotional_resonance)s,
+                %(usage_contexts)s, %(license_type)s, %(access_tier)s, %(requires_attribution)s)
+        RETURNING id;
+        """
+        
+        cursor = self.db.cursor()
+        cursor.execute(query, card_data)
+        card_id = cursor.fetchone()[0]
+        self.db.commit()
+        
+        return card_id
+    
+    def _generate_card_description(self, card_title: str, group_df) -> str:
+        """Generate a description for the card based on its content"""
+        
+        # Get sample content from different types
+        samples = []
+        
+        for kind in ['reflection_or_quote', 'question']:
+            kind_items = group_df[group_df['Kind'] == kind]['Content'].dropna()
+            if not kind_items.empty:
+                samples.append(kind_items.iloc[0][:100] + "...")
+        
+        description = f"The {card_title} card explores themes of {card_title.lower()}"
+        if samples:
+            description += f". Contains {len(group_df)} content items including stories, questions, and wisdom quotes."
+        
+        return description
+```
+
 ## Implementation Roadmap
 
-### Phase 1: Foundation (Weeks 1-4)
-- Implement content licensing framework
-- Build access control system
+### Phase 1: CSV Migration and Foundation (Weeks 1-4)
+- Implement CSV to database migration tool
+- Create POY content licensing framework
+- Build access control system specific to POY content structure
 - Create usage tracking infrastructure
-- Develop basic AI integration with open content
+- Develop basic AI integration with POY cards
 
-### Phase 2: Proprietary Integration (Weeks 5-8)
-- Implement semantic content matching
-- Build content transformation service
-- Create proprietary-aware AI coach
+### Phase 2: AI Integration and Semantic Matching (Weeks 5-8)
+- Implement POY-specific semantic content matching
+- Build content transformation service for POY methodology
+- Create POY-aware AI coach with card-based responses
 - Develop attribution and compliance systems
+- Generate embeddings for all POY cards
 
-### Phase 3: Marketplace and Revenue (Weeks 9-12)
-- Build content marketplace
-- Implement revenue sharing system
-- Create creator dashboard
-- Add advanced analytics and reporting
+### Phase 3: Advanced AI Features (Weeks 9-12)
+- Implement contextual story generation
+- Build coaching question generation based on POY cards
+- Create emotional resonance matching
+- Add session-phase-aware content selection
+- Implement revenue tracking for POY content usage
 
-### Phase 4: Advanced Features (Weeks 13-16)
-- Implement advanced AI content generation
-- Add multi-modal content support (images, audio)
-- Create enterprise licensing tools
-- Build compliance automation
+### Phase 4: Analytics and Optimization (Weeks 13-16)
+- Build comprehensive analytics dashboard
+- Implement usage pattern analysis
+- Create content effectiveness metrics
+- Add A/B testing for AI responses
+- Optimize semantic matching algorithms
 
-This comprehensive approach ensures that Points of You's proprietary content is integrated into AI conversation flows while respecting intellectual property rights, providing fair compensation to creators, and maintaining the quality and authenticity of the Points of You methodology.
+This updated approach ensures that Points of You's proprietary content structure (as defined in the CSV) is properly integrated into AI conversation flows while respecting intellectual property rights, maintaining the authentic POY methodology, and providing appropriate access controls based on subscription tiers.
