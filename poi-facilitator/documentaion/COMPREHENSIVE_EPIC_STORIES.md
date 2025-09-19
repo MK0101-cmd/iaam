@@ -469,13 +469,141 @@ This document contains comprehensive epic stories for the Points of You AI Studi
 
 ---
 
+## Authentication and Account Management Epics
+
+### Epic 19: Django-Optimized User Authentication System
+**Epic ID**: AUTH-001  
+**Priority**: Critical  
+**Estimated Effort**: 6-8 weeks  
+**User Story**: As a user, I want a secure and seamless authentication experience so that I can access the platform safely while leveraging Django's built-in security features.
+
+#### User Stories:
+- **AUTH-001-1**: As a new user, I want to register with my email address so that I can create an account using Django's AbstractUser system.
+- **AUTH-001-2**: As a user, I want to verify my email using a secure token so that my account is activated using Django's built-in token generator.
+- **AUTH-001-3**: As a user, I want to reset my password securely so that I can regain access using Django's password reset system.
+- **AUTH-001-4**: As a user, I want to login with JWT tokens so that I can access the API securely using rest_framework_simplejwt.
+- **AUTH-001-5**: As a user, I want my passwords to be securely hashed so that my credentials are protected using Django's password management.
+
+#### Acceptance Criteria:
+- [ ] Django AbstractUser model with email-based authentication
+- [ ] Email verification using Django's default_token_generator
+- [ ] Password reset flow with Django's PasswordResetView
+- [ ] JWT authentication with rest_framework_simplejwt
+- [ ] Django's built-in password validation and hashing
+- [ ] Rate limiting with django-axes for security
+- [ ] Two-factor authentication with django-otp
+- [ ] Social authentication with django-allauth
+
+#### Technical Requirements:
+- Extend Django's AbstractUser model
+- Configure USERNAME_FIELD = 'email'
+- Implement Django's email framework
+- Use Django's security middleware
+- Configure django-axes for account lockout
+- Set up django-otp for 2FA
+
+---
+
+### Epic 20: Participant-Facilitator Relationship Management
+**Epic ID**: AUTH-002  
+**Priority**: High  
+**Estimated Effort**: 8-10 weeks  
+**User Story**: As a facilitator, I want to manage my relationships with participants across multiple sessions so that I can provide continuity and personalized support while respecting participant privacy.
+
+#### User Stories:
+- **AUTH-002-1**: As a facilitator, I want to access participant information in my sessions so that I can provide better guidance.
+- **AUTH-002-2**: As a participant, I want to control what data I share with facilitators so that my privacy is protected.
+- **AUTH-002-3**: As a facilitator, I want to track participant progress across sessions so that I can provide continuity.
+- **AUTH-002-4**: As a participant, I want to participate in sessions from different facilitators so that I can learn from various perspectives.
+- **AUTH-002-5**: As a facilitator, I want to maintain private notes about participants so that I can remember their journey.
+
+#### Acceptance Criteria:
+- [ ] SessionParticipant model with privacy controls
+- [ ] ParticipantFacilitatorRelationship model for cross-session tracking
+- [ ] Granular privacy settings for data sharing
+- [ ] Data isolation between different facilitators
+- [ ] Participant consent management for data sharing
+- [ ] Facilitator access controls and permissions
+- [ ] Cross-session progress tracking
+
+#### Technical Requirements:
+- Design SessionParticipant model with privacy fields
+- Implement ParticipantFacilitatorRelationship model
+- Create privacy control interfaces
+- Implement data isolation logic
+- Use Django's permission system
+
+---
+
+### Epic 21: Multi-Tenant Organization Management
+**Epic ID**: AUTH-003  
+**Priority**: High  
+**Estimated Effort**: 10-12 weeks  
+**User Story**: As an organization admin, I want to manage users and settings for my organization so that I can provide a customized experience while maintaining data isolation.
+
+#### User Stories:
+- **AUTH-003-1**: As an org admin, I want to create and manage organizations so that I can serve multiple clients.
+- **AUTH-003-2**: As an org admin, I want to invite users to my organization so that I can control access.
+- **AUTH-003-3**: As an org admin, I want to set custom branding so that users see our organization's identity.
+- **AUTH-003-4**: As an org admin, I want to manage user roles and permissions so that I can control access levels.
+- **AUTH-003-5**: As an org admin, I want to view organization analytics so that I can track usage.
+
+#### Acceptance Criteria:
+- [ ] Multi-tenant architecture with django-tenants
+- [ ] Organization model with custom settings
+- [ ] User invitation and management system
+- [ ] Custom branding per organization
+- [ ] Role-based permissions with Django Groups
+- [ ] Organization-level analytics
+- [ ] Data isolation between tenants
+- [ ] SSO integration with django-allauth
+
+#### Technical Requirements:
+- Implement django-tenants for multi-tenancy
+- Create Organization model with settings
+- Use Django Groups and Permissions
+- Implement custom branding system
+- Create organization admin interface
+
+---
+
+### Epic 22: Role-Based Onboarding System
+**Epic ID**: AUTH-004  
+**Priority**: High  
+**Estimated Effort**: 6-8 weeks  
+**User Story**: As a new user, I want a personalized onboarding experience based on my role so that I can quickly get started with the platform.
+
+#### User Stories:
+- **AUTH-004-1**: As a facilitator, I want a specialized onboarding flow so that I can set up my facilitation preferences.
+- **AUTH-004-2**: As a participant, I want a personalized onboarding so that I can configure my learning preferences.
+- **AUTH-004-3**: As an educator, I want an education-focused onboarding so that I can set up my classroom.
+- **AUTH-004-4**: As an org admin, I want an administrative onboarding so that I can configure my organization.
+- **AUTH-004-5**: As a user, I want to complete my profile setup so that I can access all features.
+
+#### Acceptance Criteria:
+- [ ] Role selection interface after email verification
+- [ ] Facilitator onboarding with session preferences
+- [ ] Participant onboarding with goal setting
+- [ ] Educator onboarding with classroom setup
+- [ ] Organization admin onboarding with org setup
+- [ ] Progress tracking through onboarding steps
+- [ ] Multilingual onboarding support
+
+#### Technical Requirements:
+- Create role-specific onboarding flows
+- Implement onboarding progress tracking
+- Use Django's internationalization for multilingual support
+- Create onboarding completion validation
+
+---
+
 ## Technical Infrastructure Epics
 
-### Epic 19: Scalable Backend Architecture
+### Epic 23: Scalable Backend Architecture
 **Epic ID**: TECH-001  
 **Priority**: Critical  
 **Estimated Effort**: 12-16 weeks  
-**User Story**: As a developer, I want a robust backend architecture so that the platform can scale to support thousands of concurrent users.
+**User Story**: As a developer, I want a robust Django-based backend architecture so that the platform can scale to support thousands of concurrent users while leveraging Django's built-in features.
 
 #### User Stories:
 - **TECH-001-1**: As a developer, I want RESTful APIs for all frontend interactions so that the system is maintainable and testable.
@@ -495,27 +623,38 @@ This document contains comprehensive epic stories for the Points of You AI Studi
 
 ---
 
-### Epic 20: Security and Compliance
+### Epic 24: Django Security and Compliance
 **Epic ID**: TECH-002  
 **Priority**: Critical  
 **Estimated Effort**: 8-12 weeks  
-**User Story**: As a user, I want my data to be secure and compliant with regulations so that I can trust the platform with sensitive information.
+**User Story**: As a user, I want my data to be secure and compliant with regulations so that I can trust the platform with sensitive information, leveraging Django's built-in security features.
 
 #### User Stories:
-- **TECH-002-1**: As a user, I want secure authentication and authorization so that my account is protected.
-- **TECH-002-2**: As a user, I want data encryption in transit and at rest so that my information is secure.
-- **TECH-002-3**: As a user, I want GDPR compliance so that my privacy rights are respected.
-- **TECH-002-4**: As a user, I want audit logging so that I can see who accessed my data.
-- **TECH-002-5**: As a user, I want data export and deletion capabilities so that I can control my information.
+- **TECH-002-1**: As a user, I want secure authentication using Django's security features so that my account is protected.
+- **TECH-002-2**: As a user, I want data encryption and Django's security middleware so that my information is secure.
+- **TECH-002-3**: As a user, I want GDPR compliance with Django's privacy features so that my privacy rights are respected.
+- **TECH-002-4**: As a user, I want audit logging using Django's logging framework so that I can see who accessed my data.
+- **TECH-002-5**: As a user, I want data export and deletion using Django's data protection tools so that I can control my information.
 
 #### Acceptance Criteria:
-- [ ] OAuth 2.0 and JWT authentication
-- [ ] End-to-end encryption
-- [ ] GDPR compliance implementation
-- [ ] Comprehensive audit logging
-- [ ] Data export and deletion tools
-- [ ] Security vulnerability scanning
+- [ ] Django's built-in authentication with JWT support
+- [ ] Django security middleware (CSRF, XSS, HSTS)
+- [ ] End-to-end encryption with Django's security features
+- [ ] GDPR compliance with Django's data protection tools
+- [ ] Comprehensive audit logging with Django's logging framework
+- [ ] Data export and deletion with Django ORM
+- [ ] Security vulnerability scanning with Django security checks
 - [ ] Privacy policy and consent management
+- [ ] Django-axes for account lockout protection
+- [ ] Django-otp for two-factor authentication
+
+#### Technical Requirements:
+- Configure Django security middleware
+- Implement Django's CSRF protection
+- Use Django's logging framework for audit trails
+- Implement GDPR compliance with Django tools
+- Set up django-axes for security
+- Configure django-otp for 2FA
 
 ---
 
@@ -595,13 +734,17 @@ This document contains comprehensive epic stories for the Points of You AI Studi
 
 ## Implementation Timeline and Dependencies
 
-### Phase 1: Foundation (Weeks 1-12)
+### Phase 1: Foundation and Authentication (Weeks 1-12)
 - Epic 1: Global Language Support Implementation
-- Epic 19: Scalable Backend Architecture
-- Epic 20: Security and Compliance
-- Epic 22: Universal Accessibility
+- Epic 19: Django-Optimized User Authentication System
+- Epic 20: Participant-Facilitator Relationship Management
+- Epic 23: Scalable Backend Architecture
+- Epic 24: Django Security and Compliance
+- Epic 25: Universal Accessibility
 
-### Phase 2: Core Features (Weeks 13-24)
+### Phase 2: Core Features and Onboarding (Weeks 13-24)
+- Epic 21: Multi-Tenant Organization Management
+- Epic 22: Role-Based Onboarding System
 - Epic 3: Journey Builder and Design Studio
 - Epic 6: Personal Dashboard and Progress Tracking
 - Epic 8: Live Session Participation
@@ -615,15 +758,14 @@ This document contains comprehensive epic stories for the Points of You AI Studi
 
 ### Phase 4: Advanced Features (Weeks 37-48)
 - Epic 15: Session Analytics Dashboard
-- Epic 17: Multi-Tenant Organization Management
 - Epic 18: Content Library and Marketplace
-- Epic 21: Performance Optimization
+- Epic 26: Performance Optimization
 
 ### Phase 5: Polish and Scale (Weeks 49-60)
 - Epic 2: Translation Management System
 - Epic 5: AI Co-Pilot for Facilitators
 - Epic 7: Digital Journal and Reflection System
-- Epic 23: Cross-Platform Compatibility
+- Epic 27: Cross-Platform Compatibility
 
 ---
 
