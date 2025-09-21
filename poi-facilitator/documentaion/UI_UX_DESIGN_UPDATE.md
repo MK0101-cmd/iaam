@@ -458,6 +458,298 @@ spacing: {
 - Performance optimization
 - Documentation updates
 
+## Offline UI Patterns and Design Considerations
+
+### Offline-First Design Philosophy
+The Points of You AI Studio implements an offline-first approach, ensuring users can continue their personal growth journey regardless of internet connectivity. The UI patterns below provide clear visual feedback and intuitive interactions for offline scenarios.
+
+### Offline Status Indicators
+
+#### Connection Status Badge
+```tsx
+// Online status
+<Badge variant="success" dot>
+  <Wifi className="w-3 h-3 mr-1" />
+  Online
+</Badge>
+
+// Offline status
+<Badge variant="warning" dot>
+  <WifiOff className="w-3 h-3 mr-1" />
+  Offline
+</Badge>
+
+// Syncing status
+<Badge variant="info" dot>
+  <RefreshCw className="w-3 h-3 mr-1 animate-spin" />
+  Syncing...
+</Badge>
+```
+
+#### Sync Progress Indicator
+```tsx
+<SyncProgress 
+  total={15} 
+  synced={12} 
+  failed={1}
+  status="syncing"
+  onRetry={() => retryFailedSync()}
+/>
+```
+
+### Offline Journal Interface
+
+#### Offline Journal Editor
+```tsx
+<OfflineJournalEditor
+  entry={journalEntry}
+  isOffline={true}
+  autoSave={true}
+  onSave={(content) => saveLocally(content)}
+  onSync={() => syncWhenOnline()}
+  voiceEnabled={true}
+  conflictResolution={true}
+/>
+```
+
+#### Offline Writing States
+```tsx
+// Writing state
+<div className="flex items-center gap-2 text-sm text-neutral-600">
+  <div className="w-2 h-2 bg-primary-500 rounded-full animate-pulse" />
+  <span>Writing offline...</span>
+</div>
+
+// Auto-save state
+<div className="flex items-center gap-2 text-sm text-neutral-600">
+  <Save className="w-3 h-3" />
+  <span>Auto-saved 2 minutes ago</span>
+</div>
+
+// Sync pending state
+<div className="flex items-center gap-2 text-sm text-warning-600">
+  <Clock className="w-3 h-3" />
+  <span>3 entries pending sync</span>
+</div>
+```
+
+### Mobile Offline Patterns
+
+#### Touch-Optimized Offline Interface
+```tsx
+<MobileOfflineJournal
+  entries={localEntries}
+  onSwipeLeft={() => nextEntry()}
+  onSwipeRight={() => previousEntry()}
+  onSwipeUp={() => newEntry()}
+  onSwipeDown={() => openSearch()}
+  hapticFeedback={true}
+  voiceEnabled={true}
+/>
+```
+
+#### Voice Input Interface
+```tsx
+<VoiceInput
+  isRecording={isRecording}
+  isOffline={true}
+  onStart={() => startVoiceInput()}
+  onStop={() => stopVoiceInput()}
+  onResult={(text) => updateJournalEntry(text)}
+  language="en"
+  placeholder="Tap to speak or type..."
+/>
+```
+
+### Offline Error Handling
+
+#### Connection Error States
+```tsx
+// No connection error
+<OfflineError
+  type="no-connection"
+  title="You're offline"
+  description="Your journal entries are saved locally and will sync when you reconnect."
+  action="Continue Writing"
+  onAction={() => continueOffline()}
+/>
+
+// Sync error
+<OfflineError
+  type="sync-error"
+  title="Sync failed"
+  description="Some entries couldn't be synced. They're saved locally."
+  action="Retry Sync"
+  onAction={() => retrySync()}
+/>
+
+// Storage full error
+<OfflineError
+  type="storage-full"
+  title="Storage almost full"
+  description="Free up space or export some entries to continue."
+  action="Manage Storage"
+  onAction={() => openStorageManager()}
+/>
+```
+
+### Offline Navigation Patterns
+
+#### Offline-Aware Navigation
+```tsx
+<Navigation
+  items={[
+    {
+      id: "journal",
+      label: "Journal",
+      icon: <BookOpen className="w-4 h-4" />,
+      offline: true, // Available offline
+      badge: unsavedCount > 0 ? unsavedCount : null
+    },
+    {
+      id: "sessions",
+      label: "Sessions",
+      icon: <Users className="w-4 h-4" />,
+      offline: false, // Requires connection
+      disabled: isOffline
+    }
+  ]}
+/>
+```
+
+#### Offline Mode Toggle
+```tsx
+<OfflineModeToggle
+  isOffline={isOffline}
+  onToggle={() => toggleOfflineMode()}
+  availableOffline={offlineFeatures}
+  pendingSync={pendingSyncCount}
+/>
+```
+
+### Offline Data Management
+
+#### Local Storage Indicator
+```tsx
+<StorageIndicator
+  used={storageUsed}
+  total={storageTotal}
+  entries={localEntryCount}
+  lastSync={lastSyncTime}
+  onManage={() => openStorageManager()}
+/>
+```
+
+#### Conflict Resolution UI
+```tsx
+<ConflictResolution
+  conflicts={conflicts}
+  onResolve={(conflictId, resolution) => resolveConflict(conflictId, resolution)}
+  onKeepLocal={(conflictId) => keepLocal(conflictId)}
+  onKeepRemote={(conflictId) => keepRemote(conflictId)}
+  onMerge={(conflictId) => openMergeEditor(conflictId)}
+/>
+```
+
+### Offline Animation Patterns
+
+#### Offline-Specific Animations
+```css
+/* Offline writing animation */
+.animate-offline-writing {
+  animation: offline-writing 2s ease-in-out infinite;
+}
+
+@keyframes offline-writing {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+/* Sync progress animation */
+.animate-sync-progress {
+  animation: sync-progress 1.5s ease-in-out infinite;
+}
+
+@keyframes sync-progress {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Offline pulse */
+.animate-offline-pulse {
+  animation: offline-pulse 3s ease-in-out infinite;
+}
+
+@keyframes offline-pulse {
+  0%, 100% { 
+    box-shadow: 0 0 0 0 rgba(237, 128, 23, 0.4);
+  }
+  50% { 
+    box-shadow: 0 0 0 8px rgba(237, 128, 23, 0);
+  }
+}
+```
+
+### Offline Accessibility Patterns
+
+#### Screen Reader Support
+```tsx
+// Offline status announcement
+<div 
+  role="status" 
+  aria-live="polite"
+  className="sr-only"
+>
+  {isOffline ? "You are now offline. Your work is being saved locally." : "You are back online. Syncing your changes."}
+</div>
+
+// Offline content labeling
+<div 
+  aria-label="Journal entry, offline mode"
+  role="textbox"
+  contentEditable
+  data-offline="true"
+>
+  {journalContent}
+</div>
+```
+
+#### Keyboard Navigation for Offline
+```tsx
+<OfflineKeyboardShortcuts
+  shortcuts={{
+    'Ctrl+S': 'Save locally',
+    'Ctrl+Shift+S': 'Force sync',
+    'Ctrl+O': 'Open offline mode',
+    'Ctrl+E': 'Export entries'
+  }}
+  onShortcut={(shortcut) => handleShortcut(shortcut)}
+/>
+```
+
+### Offline Performance Patterns
+
+#### Lazy Loading for Offline Content
+```tsx
+<LazyOfflineContent
+  threshold={100}
+  fallback={<OfflineSkeleton />}
+  onLoad={() => loadOfflineContent()}
+>
+  <OfflineJournalList entries={entries} />
+</LazyOfflineContent>
+```
+
+#### Offline Caching Indicators
+```tsx
+<CacheIndicator
+  cached={cachedItems}
+  total={totalItems}
+  lastUpdate={lastCacheUpdate}
+  onRefresh={() => refreshCache()}
+/>
+```
+
 ## Future Considerations
 
 ### Design System Evolution
@@ -466,6 +758,7 @@ spacing: {
 - **Dark Mode**: Plan for potential dark mode implementation
 - **Internationalization**: Consider RTL language support
 - **Mobile App**: Prepare for potential native mobile app development
+- **Offline-First**: Expand offline patterns for all core features
 
 ### Accessibility Roadmap
 - **WCAG 2.2 Compliance**: Plan upgrade to latest accessibility standards

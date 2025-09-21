@@ -19,6 +19,7 @@ This document provides detailed Sprint 1 and Sprint 2 plans for the Points of Yo
 3. **Basic AI Integration**: Set up AI service foundation and conversation prototype
 4. **Core UI Components**: Create component library and basic user interfaces
 5. **Integration Framework**: Establish API contracts and real-time communication foundation
+6. **Offline Capabilities**: Implement PWA foundation and offline journal system
 
 ---
 
@@ -119,7 +120,7 @@ Acceptance Criteria:
   - API endpoints documented with drf-spectacular
 ```
 
-#### Day 9-10: Real-time Foundation and Integration
+#### Day 9-10: Real-time Foundation and Offline Support
 ```yaml
 Tasks:
   - Django Channels WebSocket consumer setup
@@ -129,6 +130,11 @@ Tasks:
   - Integration testing setup with pytest-django
   - Error handling and Django validation implementation
   - Database query optimization with select_related/prefetch_related
+  - Offline journal API endpoints:
+    * /api/journal/entries/ - CRUD operations for journal entries
+    * /api/journal/sync/ - Sync offline changes when online
+    * /api/journal/conflicts/ - Handle simultaneous edit conflicts
+  - Background sync queue implementation for offline changes
 
 Deliverables:
   - ✅ WebSocket connection handling
@@ -137,6 +143,8 @@ Deliverables:
   - ✅ Complete API documentation
   - ✅ Integration testing framework
   - ✅ Optimized database queries
+  - ✅ Offline journal API endpoints
+  - ✅ Background sync queue system
 
 Acceptance Criteria:
   - WebSocket connections authenticate properly
@@ -144,6 +152,9 @@ Acceptance Criteria:
   - API documentation auto-generated and accurate
   - Integration tests pass consistently
   - Database queries optimized for performance
+  - Journal entries can be created and synced offline
+  - Conflict resolution handles simultaneous edits
+  - Background sync processes queued changes
 ```
 
 ### Sprint 1 Integration Points
@@ -384,7 +395,7 @@ Acceptance Criteria:
   - Session status reflects current state
 ```
 
-#### Day 9-10: AI Coach Interface and Integration Testing
+#### Day 9-10: AI Coach Interface and Offline PWA Implementation
 ```yaml
 Tasks:
   - AI coach chat interface:
@@ -393,6 +404,16 @@ Tasks:
     * Typing indicators and loading states
     * Voice activation toggle (UI only)
   - Integration with AI service APIs
+  - PWA implementation for offline support:
+    * Service worker setup with Workbox
+    * Web app manifest configuration
+    * Offline caching strategy for static assets
+    * Background sync for journal entries
+  - Offline journal system:
+    * IndexedDB integration for local storage
+    * Offline journal editor component
+    * Auto-save functionality (every 30 seconds)
+    * Sync status indicators and conflict resolution UI
   - Component testing with Jest and RTL
   - Cross-browser compatibility testing
   - Performance optimization and lazy loading
@@ -401,6 +422,8 @@ Tasks:
 Deliverables:
   - ✅ AI coach chat interface
   - ✅ AI service API integration
+  - ✅ PWA with service worker and manifest
+  - ✅ Offline journal system with IndexedDB
   - ✅ Component testing suite
   - ✅ Cross-browser compatibility
   - ✅ Accessibility compliance
@@ -408,6 +431,8 @@ Deliverables:
 Acceptance Criteria:
   - AI coach interface provides smooth conversation
   - API integration handles errors gracefully
+  - PWA installs and works offline
+  - Journal entries save locally and sync when online
   - Component tests achieve 90%+ coverage
   - Interface works across major browsers
   - Accessibility standards met
@@ -468,6 +493,7 @@ Day 10: Sprint Integration Testing
 3. **AI Enhancement**: Advanced conversation and recommendations
 4. **Live Session UI**: Real-time participant interfaces
 5. **Analytics Foundation**: Basic session analytics and reporting
+6. **Advanced Offline Features**: Voice integration and conflict resolution
 
 ---
 
@@ -862,7 +888,7 @@ Acceptance Criteria:
   - Real-time features perform smoothly with 50+ participants
 ```
 
-#### Day 19-20: Analytics Dashboard and Performance Optimization
+#### Day 19-20: Analytics Dashboard and Advanced Offline Features
 ```yaml
 Tasks:
   - Analytics dashboard implementation:
@@ -871,6 +897,12 @@ Tasks:
     * Card selection pattern analysis
     * Comparative analytics across sessions
     * Export functionality for reports
+  - Advanced offline features:
+    * Voice-to-text integration for offline journal writing
+    * Offline search through cached journal entries
+    * Conflict resolution UI for simultaneous edits
+    * Offline export functionality (PDF, TXT, JSON)
+    * Haptic feedback for mobile offline interactions
   - Performance optimization:
     * Lazy loading for large datasets
     * Virtual scrolling for participant lists
@@ -881,6 +913,7 @@ Tasks:
 Deliverables:
   - ✅ Comprehensive analytics dashboard
   - ✅ Data visualization components
+  - ✅ Advanced offline features with voice integration
   - ✅ Performance optimization
   - ✅ Accessibility improvements
   - ✅ Cross-browser testing
@@ -888,6 +921,9 @@ Deliverables:
 Acceptance Criteria:
   - Analytics dashboard loads quickly with large datasets
   - Data visualizations are clear and actionable
+  - Voice-to-text works offline on mobile devices
+  - Offline search finds journal entries quickly
+  - Conflict resolution UI is intuitive and clear
   - Performance meets Lighthouse score requirements
   - Accessibility standards maintained (WCAG 2.1 AA)
   - Cross-browser compatibility verified
@@ -956,17 +992,22 @@ Technical Metrics:
   - API response time: <200ms for 95th percentile
   - WebSocket connection: <100ms latency
   - Language switching: <1 second response time
+  - PWA installation: >90% success rate
+  - Offline journal sync: <5 seconds for 100 entries
 
 User Experience Metrics:
   - Registration flow completion: >95%
   - Login success rate: >99%
   - Language preference persistence: 100%
   - AI conversation relevance: >80% user satisfaction
+  - Offline journal usage: >60% of entries created offline
+  - PWA user retention: >80% after installation
 
 Integration Metrics:
   - API contract compliance: 100%
   - Cross-service communication: <2 second response time
   - Error handling coverage: 100% of error scenarios
+  - Offline sync success rate: >95%
 ```
 
 ### Sprint 2 Success Metrics
@@ -976,18 +1017,24 @@ Technical Metrics:
   - Session management: Support for 50+ concurrent participants
   - Analytics generation: <5 seconds for complex reports
   - Video integration: <2 seconds to join session
+  - Offline voice recognition: >90% accuracy on mobile
+  - Conflict resolution: <5% of syncs require manual intervention
 
 User Experience Metrics:
   - Journey creation completion: >90%
   - Live session participation: <10% drop-off rate
   - Content recommendation relevance: >85% user satisfaction
   - Facilitator dashboard usability: <3 clicks for common tasks
+  - Offline journal voice input: >70% of mobile users prefer voice
+  - Offline search satisfaction: >90% find entries quickly
 
 Business Metrics:
   - Content library usage: >70% of available content accessed
   - Session completion rate: >85%
   - AI coach engagement: >60% of participants interact
   - Facilitator productivity: 30% reduction in session prep time
+  - Offline usage: >60% of journal entries created offline
+  - PWA adoption: >40% of users install PWA
 ```
 
 ---

@@ -186,9 +186,12 @@ This document contains comprehensive epic stories for the Points of You AI Studi
 #### User Stories:
 - **PAR-002-1**: As a participant, I want to create journal entries with rich text formatting so that I can express my thoughts clearly.
 - **PAR-002-2**: As a participant, I want AI-generated reflection prompts so that I can explore different aspects of my experiences.
-- **PAR-002-3**: As a participant, I want to search and filter my journal entries so that I can find specific reflections.
-- **PAR-002-4**: As a participant, I want to tag entries with themes so that I can organize my thoughts.
-- **PAR-002-5**: As a participant, I want to export my journal so that I can keep a personal copy.
+- **PAR-002-3**: As a participant, I want to write journal entries offline so that I can reflect anywhere without internet connectivity.
+- **PAR-002-4**: As a participant, I want my journal entries to sync automatically when I reconnect so that I never lose my thoughts.
+- **PAR-002-5**: As a participant, I want to use voice-to-text for journal entries so that I can write hands-free on mobile devices.
+- **PAR-002-6**: As a participant, I want to search and filter my journal entries so that I can find specific reflections.
+- **PAR-002-7**: As a participant, I want to tag entries with themes so that I can organize my thoughts.
+- **PAR-002-8**: As a participant, I want to export my journal so that I can keep a personal copy.
 
 #### Acceptance Criteria:
 - [ ] Rich text editor with formatting options
@@ -198,6 +201,11 @@ This document contains comprehensive epic stories for the Points of You AI Studi
 - [ ] Export functionality (PDF, text)
 - [ ] Book-themed UI design
 - [ ] Auto-save functionality
+- [ ] **Offline journal writing capability**
+- [ ] **Automatic sync when connection restored**
+- [ ] **Voice-to-text integration for mobile**
+- [ ] **Local storage with IndexedDB**
+- [ ] **Conflict resolution for simultaneous edits**
 
 ---
 

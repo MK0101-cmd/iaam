@@ -451,6 +451,150 @@ Frontend Developer:
   - Launch preparation and documentation
 ```
 
+### Phase 4: Offline Capabilities and PWA Implementation (Weeks 13-16)
+
+#### Week 13: PWA Foundation and Service Worker
+```yaml
+Django Developer:
+  - Offline journal API endpoints:
+    * /api/journal/entries/ - CRUD operations for journal entries
+    * /api/journal/sync/ - Sync offline changes when online
+    * /api/journal/conflicts/ - Handle simultaneous edit conflicts
+  - Background sync queue implementation
+  - Offline data validation and sanitization
+  - Conflict resolution algorithms
+  - Offline storage optimization
+
+AI Developer:
+  - Offline voice recognition integration
+  - Device-based speech-to-text models
+  - Offline content recommendation caching
+  - Local AI model deployment for offline features
+  - Offline prompt generation system
+
+Frontend Developer:
+  - Service worker implementation with Workbox
+  - Web app manifest configuration
+  - Offline caching strategy for static assets
+  - PWA installation prompts and UI
+  - Offline status indicators and notifications
+  - IndexedDB integration for local storage
+```
+
+#### Week 14: Offline Journal System
+```yaml
+Django Developer:
+  - Journal entry synchronization algorithms
+  - Offline data compression and optimization
+  - Conflict resolution API endpoints
+  - Offline analytics data collection
+  - Data integrity validation for offline entries
+
+AI Developer:
+  - Offline voice-to-text implementation
+  - Local content search and filtering
+  - Offline reflection prompt generation
+  - Voice command processing for offline mode
+  - Offline AI coaching responses
+
+Frontend Developer:
+  - Offline journal editor with auto-save
+  - Local search through cached entries
+  - Offline export functionality (PDF, TXT, JSON)
+  - Conflict resolution UI components
+  - Offline voice input interface
+  - Haptic feedback for mobile interactions
+```
+
+#### Week 15: Advanced Offline Features
+```yaml
+Django Developer:
+  - Offline data synchronization optimization
+  - Batch sync operations for large datasets
+  - Offline analytics and reporting
+  - Data migration tools for offline storage
+  - Offline backup and restore functionality
+
+AI Developer:
+  - Offline emotion analysis for journal entries
+  - Local pattern recognition and insights
+  - Offline content personalization
+  - Voice command recognition for offline mode
+  - Offline learning and adaptation
+
+Frontend Developer:
+  - Advanced offline UI patterns
+  - Offline mode toggle and settings
+  - Offline storage management interface
+  - Offline performance optimization
+  - Cross-device offline synchronization
+  - Offline accessibility enhancements
+```
+
+#### Week 16: Offline Testing and Optimization
+```yaml
+Django Developer:
+  - Offline functionality load testing
+  - Sync performance optimization
+  - Offline data integrity testing
+  - Conflict resolution testing
+  - Offline security validation
+
+AI Developer:
+  - Offline AI model performance testing
+  - Voice recognition accuracy testing
+  - Offline content recommendation testing
+  - Local model optimization
+  - Offline learning effectiveness testing
+
+Frontend Developer:
+  - Offline PWA testing across devices
+  - Offline performance optimization
+  - Offline accessibility testing
+  - Cross-browser offline compatibility
+  - Offline user experience testing
+```
+
+### Offline Development Dependencies
+
+#### **Phase 4: Offline Capabilities**
+```json
+{
+  "dependencies": {
+    "idb": "^7.1.1",
+    "workbox-webpack-plugin": "^7.0.0",
+    "react-idb": "^1.0.0",
+    "dexie": "^3.2.4",
+    "workbox-precaching": "^7.0.0",
+    "workbox-routing": "^7.0.0",
+    "workbox-strategies": "^7.0.0",
+    "workbox-background-sync": "^7.0.0"
+  }
+}
+```
+
+### Offline Development Milestones
+
+#### Week 13 Milestone:
+- PWA foundation with service worker
+- Basic offline journal functionality
+- Offline status indicators working
+
+#### Week 14 Milestone:
+- Complete offline journal system
+- Voice-to-text offline integration
+- Local storage and sync working
+
+#### Week 15 Milestone:
+- Advanced offline features implemented
+- Offline analytics and insights
+- Cross-device synchronization
+
+#### Week 16 Milestone:
+- Offline functionality fully tested
+- Performance optimized for offline use
+- Production-ready offline capabilities
+
 ## Technical Architecture and Integration Points
 
 ### Backend-AI Integration (Django-Optimized)

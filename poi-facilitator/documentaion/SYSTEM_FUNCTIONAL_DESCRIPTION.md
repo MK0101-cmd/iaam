@@ -36,6 +36,7 @@ The full system architecture will include:
 4. **AI Services**: LLM integration for coaching and content generation
 5. **Video Integration**: Zoom/Teams SDK integration for live sessions
 6. **Cloud Infrastructure**: Scalable cloud deployment with CDN
+7. **Offline Capabilities**: Progressive Web App (PWA) with local storage and sync
 
 ## User Roles and Access Patterns
 
@@ -119,6 +120,14 @@ The application uses hash-based routing with the following routes:
 - Goal setting and tracking interface
 - Achievement badge system
 - Reflection prompt generation
+
+**Offline Capabilities (Planned Implementation)**:
+- **Progressive Web App (PWA)**: Service worker for offline functionality
+- **Local Storage**: IndexedDB for journal entries and user data
+- **Offline Journal Writing**: Create and edit entries without internet
+- **Auto-Sync**: Automatic synchronization when connection restored
+- **Conflict Resolution**: Handle simultaneous edits gracefully
+- **Voice Integration**: Offline voice-to-text for mobile devices
 
 **Live Session Features (ParticipantSessionLive)**:
 - Video tile layout with facilitator and participants
@@ -288,6 +297,67 @@ SessionAnalytics {
 }
 ```
 
+## Offline Capabilities and Progressive Web App (PWA)
+
+### Current Status
+- **No Offline Support**: Current prototype requires internet connection
+- **Local Storage**: Only language preferences stored in localStorage
+- **No PWA Implementation**: Missing service worker and manifest
+
+### Planned Offline Implementation
+
+#### **Progressive Web App (PWA) Architecture**
+- **Service Worker**: Background sync and offline caching
+- **Web App Manifest**: Native app-like installation and experience
+- **Offline Caching**: Static assets and API responses cached locally
+- **Background Sync**: Queue operations for when connection restored
+
+#### **Offline Journal System**
+- **Local Storage**: IndexedDB for journal entries and user data
+- **Offline Writing**: Create and edit journal entries without internet
+- **Auto-Save**: Automatic saving every 30 seconds
+- **Sync Queue**: Operations queued for synchronization when online
+- **Conflict Resolution**: Last-write-wins strategy with manual resolution
+
+#### **Mobile Offline Features**
+- **Voice-to-Text**: Device-based speech recognition for offline use
+- **Touch Optimization**: Gesture-based navigation for offline mode
+- **Haptic Feedback**: Visual and tactile feedback for offline actions
+- **Offline Search**: Local search through cached journal entries
+
+#### **Data Synchronization**
+- **Real-time Sync**: Immediate synchronization when online
+- **Batch Sync**: Efficient bulk synchronization for offline changes
+- **Conflict Detection**: Automatic detection of simultaneous edits
+- **Data Integrity**: Validation and recovery from corrupted local data
+
+### Technical Requirements for Offline Support
+
+#### **Dependencies**
+```json
+{
+  "dependencies": {
+    "idb": "^7.1.1",
+    "workbox-webpack-plugin": "^7.0.0",
+    "react-idb": "^1.0.0",
+    "dexie": "^3.2.4"
+  }
+}
+```
+
+#### **Browser Support**
+- **Chrome**: 80+ (full PWA support)
+- **Firefox**: 75+ (full PWA support)
+- **Safari**: 13+ (limited PWA support)
+- **Edge**: 80+ (full PWA support)
+- **Mobile Browsers**: iOS Safari 13+, Chrome Mobile 80+
+
+#### **Storage Requirements**
+- **Journal Entries**: ~1KB per entry, 1000 entries = ~1MB
+- **Card Library**: ~50KB for complete card collection
+- **User Preferences**: ~10KB for settings and preferences
+- **Total Storage**: <10MB for typical user data
+
 ## Integration Points (Current Status)
 
 ### Video Conferencing (Mock Implementation)
@@ -390,12 +460,14 @@ SessionAnalytics {
 
 ## Development Roadmap
 
-### Phase 1: Django-Optimized Backend Integration (Weeks 1-4)
+### Phase 1: Django-Optimized Backend Integration + Offline Support (Weeks 1-4)
 - **Framework Selection**: Django + Django Channels with comprehensive optimization
 - **Django Authentication**: AbstractUser with built-in security features
 - **Content Management**: Django Admin + django-cms for content library (3 weeks saved)
 - **Database Setup**: PostgreSQL with optimized Django ORM queries
 - **Real-Time Features**: Django Channels for WebSocket integration
+- **Offline Capabilities**: PWA implementation with IndexedDB and service worker
+- **Offline Journal System**: Local storage and sync for journal entries
 
 ### Phase 2: Django Analytics and Core Features (Weeks 5-8)
 - **Analytics Engine**: Django ORM aggregation + django-reportlab (2 weeks saved)
@@ -566,6 +638,7 @@ The Points of You AI Studio represents a comprehensive digital transformation of
 - Rich participant experience with journaling and live session participation
 - AI coach interface with contextual guidance and inspirational content
 - Comprehensive session management with breakout rooms and analytics
+- **Planned Offline Capabilities**: PWA with offline journal writing and sync
 
 **Future Vision**: The prototype provides a solid foundation for building a full-scale platform that will combine real-time AI capabilities with video integration, creating a powerful tool for meaningful human connection and growth while preserving the core values of reflection, connection, and personal insight that define the Points of You methodology.
 
